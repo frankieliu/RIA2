@@ -1,0 +1,6 @@
+# -*- mode: org -*-
+#+STARTUP: indent hidestars showall
+
+* Purpose
+Get a working imagej plugin using idea (intellij and maven)
+
