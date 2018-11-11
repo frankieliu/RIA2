@@ -49,7 +49,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	
 //------------------------------------	
 // GENERAL
-	static String chooseFolder = "[Please choose a folder]"; 
+	static String chooseFolder= "[Please choose a folder]"; 
 	static String chooseFile = "[Please choose a file]"; 
 	JTabbedPane tp;
 	Color dGreen = new Color(53, 146, 31);
@@ -96,7 +96,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	      tp.addTab("About RIAJ", getAboutTab());
 	      tp.addTab("RIAJ Analysis", getRootTab());
 	      tp.addTab("Disclaimer", getDisclaimerTab());
-	      	      
+          tp.setSelectedIndex(1);
 	      // Final container
 	      JPanel container = new JPanel(new BorderLayout()) ; 								
 	      container.add(tp);
@@ -203,19 +203,23 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	      rootFolderButton.setActionCommand("IMAGE_FOLDER_root");
 	      rootFolderButton.addActionListener(this);
 	      
-	      rootImageFolder = new JTextField("[Choose a folder]",40);
-//	      rootImageFolder = new JTextField("/Users/guillaumelobet/Desktop/test/",30);
-	     
-	      rootCSVFile = new JTextField("[Choose file]", 40);
+          //rootImageFolder = new JTextField("[Choose a folder]",40);
+          //rootImageFolder = new JTextField("/Users/guillaumelobet/Desktop/test/",30);
+          rootImageFolder = new JTextField("/home/adam/RootTest2/",30);    
+          //rootCSVFile = new JTextField("[Choose file]", 40);
 	      //rootCSVFile = new JTextField("/Users/guillaumelobet/Dropbox/research/projects/research/rhizotron_analysis/scripts/Root-System-Analysis/r/data/automated_analysis_2.csv", 40);
+          rootCSVFile = new JTextField("/home/adam/RootTest2/result.csv", 40);
 //	      rootCSVFile = new JTextField("/Users/guillaumelobet/Desktop/test.csv", 35);
 	      rootCSVFile.setEnabled(true);
 	      
 	      blackRoots = new JCheckBox("Black roots", true);
-	      saveImages = new JCheckBox("Save images", false);
+	      // saveImages = new JCheckBox("Save images", false);
+          saveImages = new JCheckBox("Save images", true);
 	      saveTips = new JCheckBox("Even the tips", false);
-	      saveTPS = new JCheckBox("Save TPS", false);
-	      verbatim = new JCheckBox("Verbatim", false);
+	      // saveTPS = new JCheckBox("Save TPS", false);
+          saveTPS = new JCheckBox("Save TPS", true);
+	      // verbatim = new JCheckBox("Verbatim", false);
+          verbatim = new JCheckBox("Verbatim", true);
 
 	      rootCSVButton = new JButton("Choose folder");
 	      rootCSVButton.setActionCommand("CSV_FOLDER_root");

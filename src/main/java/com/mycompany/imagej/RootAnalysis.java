@@ -31,6 +31,7 @@ import ij.measure.ResultsTable;
 
 import com.mycompany.imagej.Directionality;
 import com.mycompany.imagej.EllipticFD;
+import com.mycompany.imagej.Diameter;
 
 public class RootAnalysis {
 	
@@ -55,7 +56,13 @@ public class RootAnalysis {
     
     // Tools
 	static ResultsTable rt = new ResultsTable();
-	static PrintWriter pwParam, pwTPS, pwEFD, pwAnalysis;	
+	static PrintWriter pwParam, pwTPS, pwEFD, pwAnalysis;
+
+    // Frankie
+    static boolean saveDepth;
+    static PrintWriter pwDA, pwDL, pwDD;
+    static String depthAFolder, depthLFolder, depthDFolder;
+    
 	static ParticleAnalyzer pa;	
 	static Analyzer an;
 	
@@ -93,7 +100,13 @@ public class RootAnalysis {
 		saveEFD = efd;
 		saveShapes = shapes;
 		shapeFolder = dirS;
-		
+
+		// Frankie
+        saveDepth = true;
+        depthAFolder = file.substring(0, file.length()-4)+"-depthA.txt";
+        depthLFolder = file.substring(0, file.length()-4)+"-depthL.txt";
+        depthDFolder = file.substring(0, file.length()-4)+"-depthD.txt";
+        
 		blackRoots = black;
 		rootMinSize = minsize;
 		saveImages = save;
@@ -143,9 +156,15 @@ public class RootAnalysis {
 		
 		if(saveTPS) pwTPS = Util.initializeCSV(tpsFolder);
 		if(saveEFD) pwEFD = Util.initializeCSV(efdFolder);
-		if(saveEFD) printEFDCSVHeader();		
+		if(saveEFD) printEFDCSVHeader();
 
-		
+        // Frankie
+        if(saveDepth) {
+            pwDA = Util.initializeCSV(depthAFolder);
+            pwDL = Util.initializeCSV(depthLFolder);
+            pwDD = Util.initializeCSV(depthDFolder);
+        }
+        
 		// Create the folder structure to store the images			
 		if(saveImages || saveShapes){
 			File dirSave; 
@@ -230,8 +249,8 @@ public class RootAnalysis {
 			System.out.println("root inverted");
 		}
 		
-		// Threshold the image
-	    ip.setAutoThreshold("Otsu"); 
+		// Threshold the image (used to be Otsu
+	    ip.setAutoThreshold("Default");
 	    currentImage.setProcessor(ip);
 	    
 	    // Remove small particles in the image
@@ -286,7 +305,14 @@ public class RootAnalysis {
 		
         //Get area of the root system
         getDiameters(currentImage.duplicate(), skelImage.duplicate());
-		        
+
+        float[] ans = null;
+        ans = Diameter.getDiameters(currentImage.duplicate(),
+                                    skelImage.duplicate());
+        for(int i = 0; i < ans.length; i++) {
+            System.out.println(ans[i]);
+        }
+             
         getGeometry(currentImage.duplicate(), skelImage.duplicate());
         
         getDensityEllipses(currentImage.duplicate());
@@ -304,8 +330,10 @@ public class RootAnalysis {
         getConvexHull(currentImage.duplicate(), saveEFD);
      
         getCoordinates(currentImage.duplicate());
+
+        // Frankie:
+        getDepthProfile(currentImage.duplicate(), skelImage.duplicate());
         
-                
         counter = 0;
         
 	    // Save the images for post-processing check
@@ -331,13 +359,29 @@ public class RootAnalysis {
 		ImageProcessor ip = im.getProcessor();
 		ip.autoThreshold();;
 		//ip.invert();
-		
+
+        // Frankie: added this to show result of EDM
+        // ImageProcessor imdp = ip.duplicate();
+        // edm.toEDM(imdp);
+        // ImagePlus ipd = new ImagePlus("edm.toEDM", imdp);
+        // ipd.show();
+
 		edm.run(ip);
 		im.setProcessor(ip);
-		
+
+        // Frankie: added this to show result of EDM
+        // ImageProcessor imdp2 = ip.duplicate();
+        // ImagePlus ipd2 = new ImagePlus("edm.run", imdp2);
+        // ipd2.show();
+
 		// Create EDM Skeleton
 		im = ic.run("AND create", im, skel);
-		
+
+        
+        ImagePlus ipd3 = new ImagePlus("AND create", im.getProcessor());
+        // Frankie: added
+        // ipd3.show();
+        
 		IJ.setThreshold(im, 1, 255);
 		Analyzer.setResultsTable(rt);
 		rt.reset();
@@ -857,6 +901,77 @@ public class RootAnalysis {
 		return n-1;
 	}	
 
+    /**
+	 * 
+	 * @param im
+	 */
+	private void getDepthProfile(ImagePlus im, ImagePlus sk){
+		if(verbatim) IJ.log("------ Depth Profile");
+        
+	    ImageProcessor ip = im.getProcessor();
+	    ip.autoThreshold();
+        if(saveDepth) {
+            for(int h = 0; h < ip.getHeight(); h++){
+                int n = lineCount(ip, h);
+                pwDA.println(n);
+            }
+            pwDA.flush();
+        }
+        if(saveDepth) {
+            for(int h = 0; h < ip.getHeight(); h++){
+                int n = lineExtent(ip, h);
+                pwDD.println(n);
+            }
+            pwDD.flush();
+        }
+        ip = sk.getProcessor();
+	    ip.autoThreshold();
+        if(saveDepth) {
+            for(int h = 0; h < ip.getHeight(); h++){
+                int n = lineCount(ip, h);
+                pwDL.println(n);
+            }
+            pwDL.flush();
+	    }
+	}
+
+    /**
+	 * Compute the number of black pixels along a line
+	 * @param bp
+	 * @param h
+	 * @return
+	 */
+	private int lineCount(ImageProcessor bp, int h){
+		int n = 0;
+		int j = h;
+        for(int i = 0; i < bp.getWidth(); i++){
+            if(bp.getPixel(i, j) > 125) n++;
+		}
+		return n;
+	}	
+
+    /**
+	 * Compute the extent of black pixels along a line
+	 * @param bp
+	 * @param h
+	 * @return
+	 */
+	private int lineExtent(ImageProcessor bp, int h){
+		int n = 0;
+		int j = h;
+        int left = -1;
+        int right = -1;
+        for(int i = 0; i < bp.getWidth(); i++){
+            if ((bp.getPixel(i, j) > 125) && (left == -1)) {
+                left = i;
+            }
+            if ((bp.getPixel(i,j) < 125) && (left != -1)) {
+                right = i;
+            }
+		}
+		return right-left+1;
+	}	
+
 	/**
 	 * Print Parameters CSV header
 	 */
@@ -892,6 +1007,7 @@ public class RootAnalysis {
 		for(int i = 0; i < nCoord * 2; i++) toPrint = toPrint.concat(",coord_x"+i);
 		for(int i = 0; i < nCoord; i++) toPrint = toPrint.concat(",diff_x"+i);
 		for(int i = 0; i < nCoord; i++) toPrint = toPrint.concat(",cumul_x"+i);
+
 		pwParam.println(toPrint);
 		pwParam.flush();
 	}
