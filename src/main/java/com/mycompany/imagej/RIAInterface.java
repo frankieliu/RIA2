@@ -59,7 +59,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	JButton rootAnalysisButton, rootFolderButton, rootCSVButton; 
 	JTextField rootImageFolder, rootCSVFile;
 	JTextField rootScalePix, rootScaleCm, rootMinSize;
-	JCheckBox  blackRoots, saveImages, verbatim, saveTPS, saveTips;
+	JCheckBox  blackRoots, saveImages, verbatim, saveTPS, saveEfd, saveTips;
 	RootAnalysis ran; 
 	JSlider rootMinSizeSlider;	
 
@@ -218,6 +218,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	      saveTips = new JCheckBox("Even the tips", false);
 	      // saveTPS = new JCheckBox("Save TPS", false);
           saveTPS = new JCheckBox("Save TPS", true);
+          saveEfd = new JCheckBox("Save Efd", true);
 	      // verbatim = new JCheckBox("Verbatim", false);
           verbatim = new JCheckBox("Verbatim", true);
 
@@ -295,6 +296,9 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	      gbc3.gridy = 4;
 	      gbc3.gridx = 2;
 	      paramPanel1.add(saveTPS, gbc3);
+	      gbc3.gridy = 5;
+	      gbc3.gridx = 2;
+	      paramPanel1.add(saveEfd, gbc3);
 	      
 	      // Parameters panel
 	      JPanel paramPanel2 = new JPanel(new BorderLayout());
@@ -475,7 +479,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 							saveImages.isSelected(),
 							saveTips.isSelected(),
 							saveTPS.isSelected(),
-							false, true, rootImageFolder.getText()+"/param/"
+							saveEfd.isSelected(), true, rootImageFolder.getText()+"/param/"
 							);	
 				}
 			});

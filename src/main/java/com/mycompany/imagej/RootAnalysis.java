@@ -25,6 +25,7 @@ import ij.process.ByteProcessor;
 import ij.plugin.filter.ParticleAnalyzer;
 import ij.plugin.frame.RoiManager;
 import ij.process.ImageProcessor;
+import ij.process.FloatPolygon;
 import ij.measure.Calibration;
 import ij.measure.Measurements;
 import ij.measure.ResultsTable;
@@ -737,8 +738,15 @@ public class RootAnalysis {
 		RoiManager manager = RoiManager.getInstance();
 		Roi[] roiA = manager.getRoisAsArray();
 		Roi select = roiA[index];
-        		
-		ImageProcessor chProcessor = new PolygonRoi(select.getConvexHull(), Roi.POLYGON).getMask(); 			
+
+
+        PolygonRoi cv = new PolygonRoi(select.getConvexHull(), Roi.POLYGON);
+        FloatPolygon fp = cv.getFloatPolygon();
+        for (int i = 0; i < fp.npoints; i++) {
+            System.out.println(fp.xpoints[i] + "," + fp.ypoints[i]);
+        }
+        
+		ImageProcessor chProcessor = cv.getMask();
 		ImagePlus chImage = new ImagePlus();
 		chImage.setProcessor(chProcessor);
 		chProcessor.autoThreshold();

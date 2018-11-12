@@ -1,0 +1,72 @@
+# -*- mode: org -*-
+#+STARTUP: indent hidestars showall
+
+
+* calculating the volume from a convex hull 2d outline
+
+Given only a 2D outline (convex hull of image), estimate volume.
+
+* Using Bezier curves
+
+Originally I was thinking of using Bezier curves to form an oval
+around the outer edges of a convex hull outline, and using the
+depth gradient (slope) to dictate how much curvature to include
+in the Bezier curve.
+
+[[file:bezier_control_points.png]]
+
+But thinking about it, the depth gradient has to do with how far
+the root goes does into the soil vs how far it goes laterally, so
+assuming that the roots behave the same way laterally versus
+vertically down is not a good assumption.
+
+* Volume via average "radius" slices from convex hull
+
+Instead we calculate the volume assuming an average of the radius in
+each direction, at a particular depth.  Since (r1 + r2)*0.5 is the
+same as dividing the width at each depth by 2, we just slice the
+convex hull in the horizontal direction for each depth.
+
+To make this work however we need to "level" the roots to the same
+depth (given that the soil may not be horizontal), see rotation
+below.
+
+1. The blue curve is the original convex hull
+
+
+2. The red curve is the convex hull rotated to give the edge (with max
+   length) direction along the horizontal
+
+
+3. The top green point is the midpoint along the longest edge, the
+   other green points below come from steps 4-6 below.
+
+
+4. From that point I walk down one unit at a time, and calculate the
+   intersection of two rays one to west and one to the east to the
+   convex hull line equations (note: I am not dealing with pixels
+   here, pure equations from the convex hull)
+
+
+5. From the east and west intersections to the convex hull I calculate
+   a new midpoint
+
+
+6. Repeat from 4), until the midpoint falls out of the convex hull
+   (using Delaunay triangulation)
+
+
+7. In each 'depth' I retain the width between intersection points
+
+
+8. Finally compute the sum (pi r^2) to get the volume, see last screen
+   shot below, the last number is the volume, and the numbers above it
+   are the radii at each depth.
+
+
+9. The time taken was spent in exporting the convex hull points from
+   ImageJ (Guillaume's code only spits out an image), in manipulating
+   with the convex hull points in python, coming up with the equations
+   for hull edges, ray intersections from interior points to the hull
+   edges, rotations, and querying whether a point is inside/outside of
+   the convex hull.
