@@ -4,3 +4,10 @@
 * Purpose
 Get a working imagej plugin using idea (intellij and maven)
 
+* Importing into idea
+from IntelliJ you can go to file and open the pom
+
+* Errors associated with modules
+you will need to point modules to either the package (RIA2)
+or to JDK since using a newer one 12
+
