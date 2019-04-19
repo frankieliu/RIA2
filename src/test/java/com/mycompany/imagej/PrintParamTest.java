@@ -34,17 +34,4 @@ class PrintParamTest {
         }
     }
 
-    @Test
-    void mergeH() {
-        Map<String, Double> m = new LinkedHashMap<>();
-        for(int i=0; i<100; i++){
-            m.put(Integer.toString(i), (double) i*i);
-        }
-        pp.mergeH(m);
-        for(String s: pp.getH().keySet()) {
-            int si = Integer.parseInt(s);
-            assertEquals(pp.getH().get(s), (double) si*si);
-        }
-    }
-
 }
