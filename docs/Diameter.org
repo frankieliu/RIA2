@@ -1,0 +1,34 @@
+# -*- mode: org -*-
+#+STARTUP: indent hidestars showall
+
+* getDiameters
+** input: im, skel
+** output:
+** algorithm
+1. create edm mask (euclidean distance map)
+2. search for the main stem
+   a. find the "deepest" point
+      - The deepest point is the point with the largest edm value.  I
+        call it deep because it is further away from the edges.
+      - This is done via a max search of the edm
+   b. from the deepest point (wmax, hmax) follow to the stem root
+   c. at each height, find the left and right extents by walking until
+      left until reaching a zero, similarly for the right extent
+   d. compute the mid of left and right boundary points,
+   e. use this x coordinate as the beginning point for the next search
+      at the next height
+   f. continue this upward path until the diff of the left and right
+      extents become smaller than from the earlier height
+   g. the logic is that the stem should become wider and wider at its
+      source of origin
+3. find the max lateral radius
+   a. at each point, consider its lateral distance to the x-value of
+      the stem if it is not white
+   b. the max lateral radius will be the max of such measurements
+4. find the max radius
+   a. this is similar to 3, but calculate the point to point distance
+      between the point considered and the x, y coordinates of the
+      stem
+   b. the max radius will be the max of such measurements
+ 
+   

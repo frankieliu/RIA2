@@ -33,11 +33,15 @@ import ij.measure.ResultsTable;
 import com.mycompany.imagej.Directionality;
 import com.mycompany.imagej.EllipticFD;
 import com.mycompany.imagej.Diameter;
+import com.mycompany.imagej.Tissue;
+import com.mycompany.imagej.Rotate;
+import com.mycompany.imagej.Geometry;
+
 
 public class RootAnalysis {
 	
 	// Export parameters
-	static File dirAll, dirParam;//, dirConvex;	
+	static File dirAll, dirParam;//, dirConvex;
 	static File[] images; 		
 	static String  csvParamFolder, csvParamAnalysis, imName, baseName, fullName, tpsFolder, efdFolder, shapeFolder;
 	
@@ -171,6 +175,7 @@ public class RootAnalysis {
 			File dirSave; 
 			dirSave = Util.createFolderStructure(dirAll.getAbsolutePath(), false, false, false, true);
 			dirParam = new File(dirSave.getAbsolutePath()+"/param/");
+			Geometry.dirParam = dirParam;
 		}
 		
 		// Navigate the different images in the time serie
@@ -196,12 +201,15 @@ public class RootAnalysis {
 			// Process the name to retrieve the experiment information
 			baseName = images[i].getName();
 			fullName = images[i].getAbsolutePath();
+			Geometry.baseName = baseName;
 			
 			// Measure the image	
 			try{
 				getDescriptors(nextImage, i);
 				sendAnalysisToCSV(nextImage.getTitle(), nextImage.getWidth(), nextImage.getHeight(), startD1, System.currentTimeMillis());
 			}catch(Exception e){
+			    System.out.println("I am at the exception handling routine");
+			    e.printStackTrace(System.out);
 				System.out.println(e);
 			}
 			// Close the current image
@@ -302,9 +310,9 @@ public class RootAnalysis {
 		skelImage.setRoi(0, 0, ip.getWidth(), ip.getHeight());
 		currentImage.setRoi(0, 0, ip.getWidth(), ip.getHeight());
 		
-		//skelImage.show(); currentImage.show();
+		// skelImage.show(); currentImage.show();
 		
-        //Get area of the root system
+        // Get area of the root system
         getDiameters(currentImage.duplicate(), skelImage.duplicate());
 
         float[] ans = null;
@@ -313,8 +321,12 @@ public class RootAnalysis {
         for(int i = 0; i < ans.length; i++) {
             System.out.println(ans[i]);
         }
-             
-        getGeometry(currentImage.duplicate(), skelImage.duplicate());
+
+        Tissue.getTissue(currentImage.duplicate(), skelImage.duplicate()) ;
+
+        Rotate.getVolume(currentImage.duplicate());
+            
+        Geometry.getGeometry(currentImage.duplicate(), skelImage.duplicate());
         
         getDensityEllipses(currentImage.duplicate());
 
@@ -341,7 +353,7 @@ public class RootAnalysis {
 		currentImage.flush(); currentImage.close();
 		skelImage.flush(); skelImage.close();
 		
-	    sendParametersToCSV();
+	    // sendParametersToCSV();
 	}
 		
 
@@ -378,10 +390,15 @@ public class RootAnalysis {
 		// Create EDM Skeleton
 		im = ic.run("AND create", im, skel);
 
-        
         ImagePlus ipd3 = new ImagePlus("AND create", im.getProcessor());
         // Frankie: added
         // ipd3.show();
+
+        // Frankie
+        // Calculate tissue volume
+        // Calculate histogram
+        
+        
         
 		IJ.setThreshold(im, 1, 255);
 		Analyzer.setResultsTable(rt);
@@ -396,79 +413,6 @@ public class RootAnalysis {
 		
 		im.close();
 		skel.close();
-	}
-	
-	/**
-	 * 
-	 * @param im
-	 */
-	private void getGeometry(ImagePlus im, ImagePlus skel){
-		if(verbatim) IJ.log("- Get geometry");
-		
-        im.getProcessor().autoThreshold(); 
-        IJ.run(im, "Create Selection", "");
-        
-        Analyzer.setResultsTable(rt);
-        rt.reset();     
-
-        an = new Analyzer(skel, Measurements.AREA | Measurements.AREA_FRACTION | Measurements.RECT, rt);
-        rt.reset();        
-        an.measure();
-
-        // Area
-        length = (float) ((rt.getValue("%Area", 0) / 100 )* rt.getValue("Area", 0));
-        params[counter++] = length / scale;
-        
-        
-        an = new Analyzer(im, Measurements.AREA | Measurements.CENTER_OF_MASS | Measurements.RECT, rt);
-        rt.reset();        
-        an.measure();
-        
-        // Area
-        area = (float) rt.getValue("Area", 0);
-        params[counter++] = area / scale;
-        
-        // Width
-        width = (float) Math.max(rt.getValue("Width", 0), epsilon);
-	    params[counter++] = width / scale;
-	    
-	    // Height
-	    depth = (float) Math.max(rt.getValue("Height", 0), epsilon);
-	    params[counter++] = depth / scale;
-	    
-	    // Ratio
-	    params[counter++] = width/depth;
-	    
-	    //Center of Mass
-
-	    
-	    bX = (float) rt.getValue("BX", 0);
-	    bY = (float) rt.getValue("BY", 0);
-
-	    comX = (float) (rt.getValue("XM", 0) - bX) / width;
-	    params[counter++] = comX;
-	    comY  = (float) (rt.getValue("YM", 0) - bY)  / depth;
-	    params[counter++] = comY;
-	    
-	    //Create rectangles overlay
-	    if(saveImages){
-	     	Roi roi = new Roi((Xmid - 0.5 * width), Ymid, width, depth);
-	     	roi.setStrokeColor(Color.blue);
-	     	roi.setStrokeWidth(5);
-			Overlay overlay = new Overlay(roi); 
-			im.setOverlay(overlay); 
-			im = im.flatten(); 
-			roi = new Roi(rt.getValue("XM", 0)-5, rt.getValue("YM", 0)-5, 10, 10);
-	     	roi.setStrokeColor(Color.red);
-	     	roi.setStrokeWidth(5);
-			overlay = new Overlay(roi); 
-			im.setOverlay(overlay); 
-			im = im.flatten(); 
-	        IJ.save(im, dirParam.getAbsolutePath()+"/"+baseName+"_geometry.tiff");
-	    }
-	    
-	    im.close();
-	    skel.close();
 	}
 	
 	/**
@@ -1020,17 +964,7 @@ public class RootAnalysis {
 		pwParam.flush();
 	}
 
-	/**
-	 * Send parameters data to an CSV file
-	 */
-	private void sendParametersToCSV(){	
-		String toPrint = baseName.replaceAll(",", "-");
-		for(int i = 0; i < params.length; i++){
-			toPrint = toPrint.concat(","+params[i]);
-		}
-		pwParam.println(toPrint);
-		pwParam.flush();
-	}
+
 	
 	/**
 	 * send Shape Data To CSV

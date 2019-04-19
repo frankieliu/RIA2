@@ -1,0 +1,45 @@
+% Created 2019-01-26 Sat 08:39
+% Intended LaTeX compiler: pdflatex
+\documentclass[11pt]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\usepackage{grffile}
+\usepackage{longtable}
+\usepackage{wrapfig}
+\usepackage{rotating}
+\usepackage[normalem]{ulem}
+\usepackage{amsmath}
+\usepackage{textcomp}
+\usepackage{amssymb}
+\usepackage{capt-of}
+\usepackage{hyperref}
+\usepackage{lmodern}
+\author{adam}
+\date{\today}
+\title{}
+\hypersetup{
+ pdfauthor={adam},
+ pdftitle={},
+ pdfkeywords={},
+ pdfsubject={},
+ pdfcreator={Emacs 25.2.2 (Org mode 9.1.7)}, 
+ pdflang={English}}
+\begin{document}
+
+\tableofcontents
+
+
+\section{getTissue}
+\label{sec:orgae28fe8}
+\subsection{calculate the max and min values from EDM \& Skeleton}
+\label{sec:org8bc32cb}
+\begin{itemize}
+\item we were previously using the histogram function imagej but this
+gives incorrect max and min pixel values, so we do the whole scan
+ourselves
+\item the tissue volume is computed from the edm figures,
+i**2*pi*hist[i] where i is a particular value for the edm and
+hist[i] is the count number for that i
+\end{itemize}
+\end{document}

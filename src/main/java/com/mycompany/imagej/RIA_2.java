@@ -25,17 +25,23 @@ public class RIA_2 extends PlugInFrame{
 	
 	public static void main(String args[]) {
 		if(args.length > 0){
+
 			if(args.length == 6){
 				new RootAnalysis(new File(args[0]), args[1], Float.valueOf(args[2]), 2.54f, 
 					true, 50, false, true, true, Boolean.valueOf(args[3]), true, Boolean.valueOf(args[4]), args[5] 
 					);
-			}
-			if(args.length > 6){
+			} else if(args.length > 6){
 				new RootAnalysis(new File(args[0]), args[1], Float.valueOf(args[2]), 2.54f, 
 					true, 50, false, Boolean.valueOf(args[6]), Boolean.valueOf(args[7]), 
 					Boolean.valueOf(args[3]), false, Boolean.valueOf(args[4]), args[5] 
 					);
-			}			
+			} else {
+			    int count = 0;
+                for(String a: args){
+                    System.out.println(count + a);
+                    count++;
+                }
+            }
 			System.exit(0);
 		}
 		else{

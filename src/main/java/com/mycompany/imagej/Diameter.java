@@ -145,7 +145,7 @@ class Diameter {
         ioverPlus = Diameter.addCircle(winit, hinit, 11, ioverPlus);
         ioverPlus = Diameter.addCircle(maxLateralX, maxLateralY, 11, ioverPlus);
         ioverPlus = Diameter.addCircle(maxRadialX, maxRadialY, 11, ioverPlus);
-        ioverPlus.setTitle("Over");
+        ioverPlus.setTitle("Overlay"+wmax+" "+hmax+" "+winit+" "+hinit);
         ioverPlus.show();
 
         //----------------------------------------------------------------------

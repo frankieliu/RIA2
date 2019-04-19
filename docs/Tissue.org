@@ -1,0 +1,11 @@
+# -*- mode: org -*-
+#+STARTUP: indent hidestars showall
+
+* getTissue
+** calculate the max and min values from EDM & Skeleton
+- we were previously using the histogram function imagej but this
+  gives incorrect max and min pixel values, so we do the whole scan
+  ourselves
+- the tissue volume is computed from the edm figures,
+  i**2*pi*hist[i] where i is a particular value for the edm and
+  hist[i] is the count number for that i

@@ -1,0 +1,42 @@
+# -*- mode: org -*-
+#+STARTUP: indent hidestars showall
+
+
+* Rotating the image to minimize 
+** helper functions
+** getWH
+- threshold the image
+- get the roi
+- get the bounds of the roi
+- crop the image
+- find its width and height
+** getAngle
+- measure getWH at each rotation angle
+- whole image is rotated using bilinear interpolation from imagej
+- the rotated image is then passed through getWH
+- compare the height of the image is smaller than the previous height
+  keep rotating the image
+- the idea is that the image with smallest height is the best aligned
+  image
+- this method only works for root systems which are wider than tall
+
+** lineExtent
+- scan a line from left to right
+- on the first black pixel that it encounters, set it to the left
+  boundary
+- on the last white pixel that it encounters, set it to the right
+  boundary 
+- the lineExtent is the diff of these two numbers (+1)
+** getVolumeFromExtents
+- calculate the volume by computing the area of the slice
+- use lineExtent to get the diameter, then use it to compute
+- d*d/4 * pi
+- since each pixel is of height one, the volume is simply
+  the accumulation of the all the areas above
+** getVolume
+- same a getVolumeFromExtents but we rotate the image first
+- this is necessary because the unaligned images have incorrect
+  radial thinning as calculated with the volume from line extent
+
+
+
