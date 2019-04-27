@@ -12,10 +12,10 @@ class BitTest {
     void whichBit() {
         List<Integer> expected = Arrays.stream
             (new int[]{
-                0x10,
-                0x1000,
-                0x100000,
-                0x10000000
+                    0b100,
+                    0b1000,
+                    0b100000,
+                    0b10000000
             }).boxed().collect(Collectors.toList());
 
         int or = 0;
