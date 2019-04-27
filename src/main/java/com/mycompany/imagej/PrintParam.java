@@ -21,8 +21,8 @@ public class PrintParam {
 
     private void sendParametersToCSV(){
         String toPrint = this.baseName.replaceAll(",", "-");
-        /*      for(int i = 0; i < params.length; i++){
-            toPrint = toPrint.concat(","+params[i]);
+        /*      for(int i = 0; i < geom.length; i++){
+            toPrint = toPrint.concat(","+geom[i]);
         }
         pwParam.println(toPrint);
         pwParam.flush();

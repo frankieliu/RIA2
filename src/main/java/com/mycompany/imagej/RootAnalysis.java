@@ -175,7 +175,6 @@ public class RootAnalysis {
 			File dirSave; 
 			dirSave = Util.createFolderStructure(dirAll.getAbsolutePath(), false, false, false, true);
 			dirParam = new File(dirSave.getAbsolutePath()+"/param/");
-			Geometry.dirParam = dirParam;
 		}
 		
 		// Navigate the different images in the time serie
@@ -201,7 +200,6 @@ public class RootAnalysis {
 			// Process the name to retrieve the experiment information
 			baseName = images[i].getName();
 			fullName = images[i].getAbsolutePath();
-			Geometry.baseName = baseName;
 			
 			// Measure the image	
 			try{
@@ -326,7 +324,7 @@ public class RootAnalysis {
 
         Rotate.getVolume(currentImage.duplicate());
             
-        Geometry.getGeometry(currentImage.duplicate(), skelImage.duplicate());
+        Geometry geo = new Geometry(currentImage.duplicate(), skelImage.duplicate());
         
         getDensityEllipses(currentImage.duplicate());
 
