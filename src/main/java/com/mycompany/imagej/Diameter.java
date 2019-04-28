@@ -15,7 +15,6 @@ import ij.gui.Overlay;
 import java.awt.Color;
 
 class Diameter {
-    static boolean verbatim = false;
     
     public static ImagePlus addCircle(int w, int h, int r, ImagePlus ori) {
         
@@ -34,16 +33,16 @@ class Diameter {
      * @param skel = skeleton image
      * @param params = output metrics
      */
-    public static float[] getDiameters
-        (ImagePlus im,
-         ImagePlus skel){
-		
-        if(verbatim) IJ.log("Get diameter values");
-		EDM edm = new EDM();
+    ImagePlus im;
+    ImageProcessor ip;
+
+    Diameter(ImagePlus im0, ImagePlus skel){
+        im = im0.duplicate();
+        EDM edm = new EDM();
 		ImageCalculator ic = new ImageCalculator();
 		
 		// Create EDM mask
-		ImageProcessor ip = im.getProcessor();
+		ip = this.im.getProcessor();
 		ip.autoThreshold();;
 		//ip.invert();
 
@@ -77,7 +76,7 @@ class Diameter {
                 }
             }
         }
-        System.out.println("Max: " + max);
+        // System.out.println("Max: " + max);
 
         // 1. b) Follow from (wmax, hmax) up, to the stem root
         //       Consider only increasing lateral diameters

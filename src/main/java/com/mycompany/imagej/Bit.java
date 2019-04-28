@@ -2,7 +2,29 @@ package com.mycompany.imagej;
 import java.util.*;
 
 public class Bit {
-    public static List<Integer> whichBit(int n){
+
+    /**
+     * @param n bit masked integer to setting different choices
+     * @param m map which takes a particular set bit to a map of many int[]
+     * @return int[] of the concatenated results from the individual int[]'s from each bit mask mapped to int[]
+     */
+    public static int[] oneToMany(int n, Map<Integer, Integer[]>m) {
+        List<Integer> out = new ArrayList<>();
+        int[] bits = whichBit(n);
+        for (Integer b: bits) {
+            Integer[] many = m.get(b);
+            for (Integer el: many) {
+                out.add(el);
+            }
+        }
+        return out.stream().mapToInt(i-> i).toArray();
+    }
+
+    /**
+     * @param n the compressed bit sequence i.e. from 0b0011 to
+     * @return the separated bit choices i.e. in the form 0b0001, 0b0010, etc
+     */
+    public static int[] whichBit(int n){
         List<Integer> out = new ArrayList<>();
         int bit = 1;  // masking bit
         int counter = n;  // count down counter
@@ -13,6 +35,6 @@ public class Bit {
             bit <<= 1;
             counter >>= 1;
         }
-        return out;
+        return out.stream().mapToInt(i->i).toArray();
     }
 }

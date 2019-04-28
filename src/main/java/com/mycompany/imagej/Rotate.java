@@ -94,33 +94,11 @@ class Rotate {
         return angle - step;
 	}
 
-    /**
-	 * Compute the extent of black pixels along a line
-	 * @param bp
-	 * @param h
-	 * @return
-	 */
-	public static int lineExtent(ImageProcessor bp, int h){
-		int n = 0;
-		int j = h;
-        int left = -1;
-        int right = -1;
-        for(int i = 0; i < bp.getWidth(); i++){
-            if ((bp.getPixel(i, j) > 125) && (left == -1)) {
-                left = i;
-            }
-            if ((bp.getPixel(i,j) < 125) && (left != -1)) {
-                right = i;
-            }
-		}
-		return right-left+1;
-	}	
-
     public static double getVolumeFromExtents(ImagePlus im) {
         ImageProcessor ip = im.getProcessor();
         double vol = 0;
         for(int h = 0; h < ip.getHeight(); h++){
-            int n = lineExtent(ip, h);
+            int n = Line.extent(ip, h);
             vol += (n * n / 4) * (Math.PI);
         }
         return vol;

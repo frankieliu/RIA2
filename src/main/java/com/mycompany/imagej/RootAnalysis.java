@@ -311,14 +311,8 @@ public class RootAnalysis {
 		// skelImage.show(); currentImage.show();
 		
         // Get area of the root system
-        getDiameters(currentImage.duplicate(), skelImage.duplicate());
 
-        float[] ans = null;
-        ans = Diameter.getDiameters(currentImage.duplicate(),
-                                    skelImage.duplicate());
-        for(int i = 0; i < ans.length; i++) {
-            System.out.println(ans[i]);
-        }
+        Diameter dia = new Diameter(currentImage, skelImage);
 
         Tissue.getTissue(currentImage.duplicate(), skelImage.duplicate()) ;
 
@@ -326,15 +320,15 @@ public class RootAnalysis {
             
         Geometry geo = new Geometry(currentImage.duplicate(), skelImage.duplicate());
         
-        getDensityEllipses(currentImage.duplicate());
+        // getDensityEllipses(currentImage.duplicate());
 
-        getDensityRectangles(currentImage.duplicate());
+        // getDensityRectangles(currentImage.duplicate());
 
-        getDirectionality(currentImage.duplicate());
+        // getDirectionality(currentImage.duplicate());
         
-//        getWhiteEllipses(currentImage.duplicate());
+        // -- getWhiteEllipses(currentImage.duplicate());
 		
-        getPixelsCount(skelImage.duplicate(), currentImage.duplicate());
+        // getPixelsCount(skelImage.duplicate(), currentImage.duplicate());
         
         getPixelProfiles(skelImage.duplicate());
 
@@ -343,7 +337,7 @@ public class RootAnalysis {
         getCoordinates(currentImage.duplicate());
 
         // Frankie:
-        getDepthProfile(currentImage.duplicate(), skelImage.duplicate());
+        DepthProfile dp = new DepthProfile(currentImage.duplicate(), skelImage.duplicate());
         
         counter = 0;
         
@@ -412,191 +406,14 @@ public class RootAnalysis {
 		im.close();
 		skel.close();
 	}
-	
+
+
 	/**
 	 * 
 	 * @param im
 	 */
-	private void getDensityEllipses(ImagePlus im){
-	    
-		if(verbatim) IJ.log("-- Calculate density between ellipses");
-	    im.getProcessor().autoThreshold();
-	    im.getProcessor().invert();
-		
-	    float[] wMod = {0.125f, 0.25f, 0.375f, 0.5f};
-	    float[] dMod = {0.25f, 0.5f, 0.75f, 1f};
-	    OvalRoi[] roi = new OvalRoi[dMod.length];
-	    float areaPrev = 0;	    
-	    Analyzer.setResultsTable(rt);
 
-	    for(int i = 0; i < 4; i++){
-		
-		    roi[i] = new OvalRoi(Xmid - wMod[i] * width, Ymid, dMod[i] * width, dMod[i] * depth);
-		    im.setRoi(roi[i]);	    
-		    rt.reset();
-		    pa = new ParticleAnalyzer(ParticleAnalyzer.CLEAR_WORKSHEET, Measurements.AREA, rt, 0, 10e9, 0, 1);
-			pa.analyze(im);
-			float areaSelection = 0;
-			for(int j = 0; j < rt.getCounter(); j++){
-				areaSelection += (float) rt.getValue("Area", j);			
-			}
-			float areaProp = (areaSelection-areaPrev) / area;
-			params[counter++] = areaProp;
-		    areaPrev = areaSelection;
-		    
-	    }
 
-	    //Create Ellipse overlay
-	    if(saveImages){
-	     	im.getProcessor().invert();
-	     	for(int i = 0; i < roi.length; i++){
-	     		roi[i].setStrokeColor(Color.BLUE);
-	     		roi[i].setStrokeWidth(4);
-		    	Overlay Eloverlay = new Overlay(roi[i]); 
-		    	im.setOverlay(Eloverlay); 
-		    	im = im.flatten(); 
-	     	}	    
-	 		IJ.save(im, dirParam.getAbsolutePath()+"/"+baseName+"_ellipses.tiff");
-	    }
-	    
-	    im.close();		
-		
-	}
-	
-	/**
-	 * 
-	 * @param im
-	 * @param name
-	 */
-	private void getDensityRectangles(ImagePlus im){
-		
-		if(verbatim) IJ.log("--- Calculate density inside rectangles");
-		float ar1 = 0;
-	    float[] dMod = {0, 0.2f, 0.4f, 0.6f};
-	    Roi[] roi = new Roi[dMod.length];
-	    Analyzer.setResultsTable(rt);
-	    
-	    im.getProcessor().autoThreshold();
-	    im.getProcessor().invert();
-	    
-	    for(int i = 0; i < dMod.length; i++){	    	
-		    //roi[i] = new Roi((Xmid - 0.25 * width), Ymid + (dMod[i] * depth), 0.5 * width, 0.2 * depth);
-		    roi[i] = new Roi((Xmid - 0.5 * width), Ymid + (dMod[i] * depth), width, 0.2 * depth);
-		    im.setRoi(roi[i]);      
-		    rt.reset();
-		    pa = new ParticleAnalyzer(ParticleAnalyzer.CLEAR_WORKSHEET, Measurements.AREA, rt, 0, 10e9, 0, 1);
-			pa.analyze(im);
-			ar1 = 0;
-			for(int j = 0; j < rt.getCounter(); j++){
-				ar1 += (float) rt.getValue("Area", j);			
-			}
-		    params[counter++] = ar1 / area;
-	    	
-	    }
-	    
-	    //Create rectangles overlay
-	    if(saveImages){
-	     	im.getProcessor().invert();
-	     	for(int i = 0; i < roi.length; i++){
-	     		roi[i].setStrokeColor(Color.blue);
-	     		roi[i].setStrokeWidth(5);
-			    Overlay overlay = new Overlay(roi[i]); 
-			    im.setOverlay(overlay); 
-			    im = im.flatten(); 	
-	     	}		    
-	        IJ.save(im, dirParam.getAbsolutePath()+"/"+baseName+"_rectangles.tiff");
-	    }
-	    
-	    im.close();		
-		
-	}
-	
-	/**
-	 * 
-	 * @param im
-	 */
-	private void getDirectionality(ImagePlus im){
-		if(verbatim) IJ.log("---- Calculate directionality");
-
-	    ImageProcessor ip = im.getProcessor();
-	    ip.autoThreshold();
-	    ip.setRoi(new OvalRoi(Xmid - 0.45 * width, Ymid, 0.9 * width, 0.9 * depth));
-	    im.setProcessor(ip);	 
-	    Directionality dnlty = new Directionality();
-		
-		// Set fields and settings
-		int nbins = 10;
-		int binStart = -90;
-
-		ImagePlus img = new ImagePlus();
-		
-		img.setProcessor(ip.duplicate().rotateLeft());
-		dnlty.setImagePlus(img);
-		
-		dnlty.setMethod(Directionality.AnalysisMethod.LOCAL_GRADIENT_ORIENTATION);
-		dnlty.setBinNumber(nbins);
-		dnlty.setBinStart(binStart);
-		dnlty.setBuildOrientationMapFlag(true);
-		
-		// Do calculation
-		dnlty.computeHistograms();
-		ResultsTable rs = dnlty.displayResultsTable();
-		double angle = 0;
-		double tot = 0;
-		for(int k = 0; k < rs.getCounter(); k++){
-			for(int l = 0; l < (rs.getValueAsDouble(1, k)); l++){
-				double direct = rs.getValueAsDouble(0, k);
-				double prop = rs.getValueAsDouble(1, k);
-				angle += Math.abs(direct)*prop;
-				tot += prop;
-			}
-		}
-
-	    params[counter++] = (float) (angle / tot);
-		rs.reset();
-		
-		im.close();
-	}
-	
-	/**
-	 * 
-	 * @param im
-	 */
-	private void getPixelsCount(ImagePlus im, ImagePlus ori){
-		if(verbatim) IJ.log("------ Count Tips");
-	    ImageProcessor ip = im.getProcessor();
-	    ip.autoThreshold();
-	    //ip.invert();
-	    Roi apex;
-	    
-	    int nTips = 0;
-	    for(int w = 0; w < ip.getWidth(); w++){
-	    	for(int h = 0; h < ip.getHeight(); h++){			   
-	    		if(ip.get(w, h) > 125){
-	    			int n = nNeighbours(ip, w, h);
-	    			if(n == 1){
-	    				nTips += 1;
-	    				if(saveImages && saveTips){
-	    				    apex = new OvalRoi(w, h, 10, 10);
-	    				    apex.setStrokeColor(Color.blue);
-	    				    apex.setStrokeWidth(5);
-	    				    Overlay overlay = new Overlay(apex); 
-	    				    ori.setOverlay(overlay); 
-	    				    ori = ori.flatten(); 	 				
-	    				  }
-	    			}
-	    		}	
-	    	}   
-	    }
-	    if(saveImages && saveTips){
-		    // Save the images for post-processing check
-		    IJ.save(ori, dirParam.getAbsolutePath()+"/"+baseName+"_tips.jpeg");
-	    }
-	    im.setProcessor(ip);
-	    
-	    params[counter++] = nTips;   
-	}
-	
 	/**
 	 * 
 	 * @param im
@@ -656,97 +473,7 @@ public class RootAnalysis {
 		
 		im.close();
 	}
-	
-	private void getConvexHull(ImagePlus im, boolean efd){
-		
-		if(verbatim) IJ.log("--------- Get Convex Hull");
-		// Get bounding box
-        im.getProcessor().autoThreshold();
-		im.getProcessor().invert();
-		pa = new ParticleAnalyzer(ParticleAnalyzer.ADD_TO_MANAGER | ParticleAnalyzer.CLEAR_WORKSHEET, Measurements.AREA, rt, 0, 10e9);
-		pa.analyze(im);
-		
-		// Find the largest object in the image (the root system) in case their are still multiple objects.
-		int index = 0;
-		double max = 0;
-		for(int i = 0; i < rt.getCounter(); i++){
-			if(rt.getValue("Area", i) > max){
-				max = rt.getValue("Area", i);
-				index = i;
-			};			
-		}
-		
-		// Get the convex hull from the ROI manager (the largest object)
-		RoiManager manager = RoiManager.getInstance();
-		Roi[] roiA = manager.getRoisAsArray();
-		Roi select = roiA[index];
 
-
-        PolygonRoi cv = new PolygonRoi(select.getConvexHull(), Roi.POLYGON);
-        FloatPolygon fp = cv.getFloatPolygon();
-        for (int i = 0; i < fp.npoints; i++) {
-            System.out.println(fp.xpoints[i] + "," + fp.ypoints[i]);
-        }
-        
-		ImageProcessor chProcessor = cv.getMask();
-		ImagePlus chImage = new ImagePlus();
-		chImage.setProcessor(chProcessor);
-		chProcessor.autoThreshold();
-		
-		
-        if(saveImages){
-	        // Make shape
-    		Roi roiToOverlay = new PolygonRoi(select.getConvexHull(), Roi.POLYGON); 
-    	    roiToOverlay.setStrokeColor(Color.blue);
-    	    roiToOverlay.setStrokeWidth(5);
-    	    Overlay overlay = new Overlay(roiToOverlay); 
-    	    im.getProcessor().invert();
-    	    im.setOverlay(overlay); 
-    	    im = im.flatten(); 
-    	    
-		    // Save the images for post-processing check
-		    IJ.save(im, dirParam.getAbsolutePath()+"/"+baseName+"_convexhull.jpeg");   
-        }
-	    // Get shape measurements from the convex hull
-		chImage.getProcessor().invert();
-		Analyzer.setResultsTable(rt);
-		rt.reset();
-		pa = new ParticleAnalyzer(ParticleAnalyzer.CLEAR_WORKSHEET, Measurements.CENTER_OF_MASS |
-				Measurements.AREA, rt, 0, 10e9);
-		pa.analyze(chImage);
-		
-        if(saveShapes){  
-		    // Save the images for post-processing check
-		    IJ.save(chImage, shapeFolder+"/"+baseName+"_shape.jpeg");   
-        }
-		
-
-	    params[counter++] = (float) rt.getValue("Area", 0);  
-		if(verbatim) IJ.log("--------- Get Convex Hull4");
-
-	    
-		if(efd){
-			if(verbatim) IJ.log("EFD analysis");
-			PolygonRoi roi = new PolygonRoi(select.getConvexHull(), Roi.POLYGON);
-			Rectangle rect = roi.getBounds();
-			int n = roi.getNCoordinates();
-			double[] x = new double[n];
-			double[] y = new double[n];
-			int[] xp = roi.getXCoordinates();
-			int[] yp = roi.getYCoordinates();  
-			for (int i = 0; i < n; i++){
-			    x[i] = (double) (rect.x + xp[i]);
-			    y[i] = (double) (rect.y + yp[i]); 
-			}  
-			EllipticFD efd1 = new EllipticFD(x, y, nEFD);
-			for (int i = 0; i < efd1.nFD; i++) {
-				sendEFDDataToCSV(i+1, efd1.ax[i], efd1.ay[i],efd1.bx[i],efd1.by[i],efd1.efd[i]);
-			}	    
-		} 	
-
-
-	}
-	
 	/**
 	 * 
 	 * @param im
@@ -833,94 +560,8 @@ public class RootAnalysis {
 	}
 
 
-	/**
-	 * Compute the number of black neigbours for a point
-	 * @param bp
-	 * @param w
-	 * @param h
-	 * @return
-	 */
-	private int nNeighbours(ImageProcessor bp, int w, int h){
-		int n = 0;
-		for(int i = w-1; i <= w+1; i++){
-			for(int j = h-1; j <= h+1; j++){
-				if(bp.getPixel(i, j) > 125) n++;
-				if(n == 3) return n-1;
-			}
-		}
-		return n-1;
-	}	
 
-    /**
-	 * 
-	 * @param im
-	 */
-	private void getDepthProfile(ImagePlus im, ImagePlus sk){
-		if(verbatim) IJ.log("------ Depth Profile");
-        
-	    ImageProcessor ip = im.getProcessor();
-	    ip.autoThreshold();
-        if(saveDepth) {
-            for(int h = 0; h < ip.getHeight(); h++){
-                int n = lineCount(ip, h);
-                pwDA.println(n);
-            }
-            pwDA.flush();
-        }
-        if(saveDepth) {
-            for(int h = 0; h < ip.getHeight(); h++){
-                int n = lineExtent(ip, h);
-                pwDD.println(n);
-            }
-            pwDD.flush();
-        }
-        ip = sk.getProcessor();
-	    ip.autoThreshold();
-        if(saveDepth) {
-            for(int h = 0; h < ip.getHeight(); h++){
-                int n = lineCount(ip, h);
-                pwDL.println(n);
-            }
-            pwDL.flush();
-	    }
-	}
 
-    /**
-	 * Compute the number of black pixels along a line
-	 * @param bp
-	 * @param h
-	 * @return
-	 */
-	private int lineCount(ImageProcessor bp, int h){
-		int n = 0;
-		int j = h;
-        for(int i = 0; i < bp.getWidth(); i++){
-            if(bp.getPixel(i, j) > 125) n++;
-		}
-		return n;
-	}	
-
-    /**
-	 * Compute the extent of black pixels along a line
-	 * @param bp
-	 * @param h
-	 * @return
-	 */
-	private int lineExtent(ImageProcessor bp, int h){
-		int n = 0;
-		int j = h;
-        int left = -1;
-        int right = -1;
-        for(int i = 0; i < bp.getWidth(); i++){
-            if ((bp.getPixel(i, j) > 125) && (left == -1)) {
-                left = i;
-            }
-            if ((bp.getPixel(i,j) < 125) && (left != -1)) {
-                right = i;
-            }
-		}
-		return right-left+1;
-	}	
 
 	/**
 	 * Print Parameters CSV header
