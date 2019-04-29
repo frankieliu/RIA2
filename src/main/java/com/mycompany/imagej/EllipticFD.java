@@ -48,7 +48,7 @@ public class EllipticFD {
     * Constructor
     * @param x the x coordinates of the contour
     * @param y the y coordinates of the contour
-    * @param m the number of descriptors to compute, in not provided then 
+    * @param n the number of descriptors to compute, in not provided then
     * the number of descriptors is set to half the number of contour points
     */
   public EllipticFD(double[] x, double[] y, int n){
@@ -87,7 +87,7 @@ public class EllipticFD {
      
     //preconfigure some values
     double t = 2.0*Math.PI/m;
-    double p = 0.0;
+    double p;
     double twoOverM = 2.0/m;
     //step through each FD
     for (int k = 0; k < nFD; k++){
@@ -130,7 +130,7 @@ public class EllipticFD {
     * 
     */
   public double[][] createPolygon(){
-    double p = 0.0;
+    double p;
     double[][] xy = new double[m][2];
     double t = 2.0*Math.PI/m;
     for (int i = 0; i < m; i++){
@@ -153,7 +153,7 @@ public class EllipticFD {
     * 
     */
   public int[][] createPolygonInt(){
-    double p = 0.0;
+    double p;
     double[][] xy = new double[m][2];
     int[][] ixy = new int[m][2];
     double t = 2.0*Math.PI/m;

@@ -1,9 +1,3 @@
-/**
-* @author Guillaume Lobet |  | Forschungszentrum Jülich - Universite catholique de Louvain
-* 
-* 
-**/
-
 package com.mycompany.imagej;
 
 import ij.IJ;
@@ -86,7 +80,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 
 	/**
 	 * Create the panel
-	 * @return
+	 * @return the container
 	 */
 	private JPanel getPanel(){	
 
@@ -106,7 +100,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 
 	/**
 	 * Create the "About" tab for the interface
-	 * @return
+	 * @return the pane
 	 */
 	private JScrollPane getAboutTab(){
 
@@ -146,7 +140,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	
 	/**
 	 * Create the "Disclaimer" tab for the interface
-	 * @return
+	 * @return the pane
 	 */
 	private JScrollPane getDisclaimerTab(){
 
@@ -180,7 +174,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 
 	/**
 	 * root analysis panel
-	 * @return
+	 * @return the pane
 	 */
 	private JScrollPane getRootTab(){
 	      
@@ -407,7 +401,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	
 	/**
 	 * 
-	 * @param e
+	 * @param e event
 	 */
 	public void itemStateChanged(ItemEvent e) {
 	}
@@ -423,7 +417,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 
 //---------------------------------------------------------------------------------------------------		
 // root ANALYSIS
-		if (ae.getActionCommand() == "CSV_FOLDER_root") { 
+		if (ae.getActionCommand() == "CSV_FOLDER_root") {
 	    	  
 			JFileChooser fc = new JFileChooser();
 			csvFilter csvf = new csvFilter();
@@ -524,7 +518,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	}
 	/**
 	 * Display the about text
-	 * @return
+	 * @return disclaimer string
 	 */
 	public String displayDisclaimerText(){
 
@@ -540,7 +534,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 
 	/**
 	 * Display the about text
-	 * @return
+	 * @return a string with about text
 	 */
 	public String displayAboutText(){
 

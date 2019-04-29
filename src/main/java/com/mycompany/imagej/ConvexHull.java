@@ -11,17 +11,19 @@ import ij.plugin.filter.Analyzer;
 import ij.plugin.filter.ParticleAnalyzer;
 import ij.plugin.frame.RoiManager;
 import ij.process.ImageProcessor;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 
 import java.awt.*;
 
 public class ConvexHull {
 
-    ImagePlus im;
-    ImageProcessor ip;
-    Roi select;
-    ImagePlus chImage;
-    double[] params = new double[1];
-    int nEFD = 30;
+    public ImagePlus im;
+    public ImageProcessor ip;
+    public Roi select;
+    public ImagePlus chImage;
+    public JsonObject jobj;
+    public int nEFD = 30;
 
     ConvexHull(ImagePlus im0, boolean efd){
         im = im0.duplicate();
@@ -44,7 +46,7 @@ public class ConvexHull {
             if(rt.getValue("Area", i) > max){
                 max = rt.getValue("Area", i);
                 index = i;
-            };
+            }
         }
 
         // Get the convex hull from the ROI manager (the largest object)
@@ -66,31 +68,22 @@ public class ConvexHull {
         pa = new ParticleAnalyzer(ParticleAnalyzer.CLEAR_WORKSHEET, Measurements.CENTER_OF_MASS |
                 Measurements.AREA, rt, 0, 10e9);
         pa.analyze(chImage);
-
-        params[0] = (double) rt.getValue("Area", 0);
-
+        jobj = new JsonObject();
+        jobj.addProperty("area", rt.getValue("Area", 0));
     }
 
-    public class Efd {
-        double ax;
-        double ay;
-        double bx;
-        double by;
-        double efd;
-
-        Efd(double ax0, double ay0, double bx0, double by0, double efd0) {
-            ax = ax0;
-            ay = ay0;
-            bx = bx0;
-            by = by0;
-            efd = efd0;
-        }
-
-    }
-
-    Efd[] paramsEfd;
-
-    public double[] getEfd() {
+    /**
+     * Elliptic Fourier Descriptor
+     * This class implements the Elliptic Fourier Descriptor EFD that is described
+     * (and implemented in Matlab code) in REF1 (see chapter 7).  The EFD provides
+     * a normalized set oc coefficients that are rotation, translation and scale
+     * invariant.  The first coefficient relates to the centroid of the input shape
+     * before the EFD is computed and can be ignored.  The second FD coefficient relates
+     * to a circle circumscribed about the centroid before the EFD computation.
+     * After the EDF computation the second EFD is always 2 and can be ignored.
+     * That leaves the remaining EFD coefficients for use in comparing shapes.
+     */
+    public void getEfd() {
         PolygonRoi roi = new PolygonRoi(select.getConvexHull(), Roi.POLYGON);
         Rectangle rect = roi.getBounds();
         int n = roi.getNCoordinates();
@@ -104,10 +97,18 @@ public class ConvexHull {
         }
         EllipticFD efd1 = new EllipticFD(x, y, nEFD);
 
-        paramsEfd = new Efd[efd1.nFD];
+        JsonArray ja = new JsonArray();
+        // Number of fourier coefficients
         for (int i = 0; i < efd1.nFD; i++) {
-            paramsEfd(new Efd(efd1.ax[i], efd1.ay[i], efd1.bx[i], efd1.by[i], efd1.efd[i]));
+            JsonObject jefd = new JsonObject();
+            jefd.addProperty("ax", efd1.ax[i]);
+            jefd.addProperty("ay", efd1.ay[i]);
+            jefd.addProperty("bx", efd1.bx[i]);
+            jefd.addProperty("by", efd1.by[i]);
+            jefd.addProperty("efd", efd1.efd[i]);
+            ja.add(jefd);
         }
+        jobj.add("efd", ja);
     }
 
     public ImagePlus overlay() {

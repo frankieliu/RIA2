@@ -6,8 +6,11 @@
     import ij.gui.Overlay;
     import ij.gui.Roi;
     import ij.process.ImageProcessor;
+    import com.mycompany.imagej.Line;
 
-    import java.util.List;
+    import com.google.gson.JsonObject;
+    import java.awt.*;
+    import java.util.*;
 
     public class PixelCount {
 
@@ -21,10 +24,11 @@
             }
         }
 
-        List<Point> tip;
-        ImagePlus im;
-        ImageProcessor ip;
-        ImagePlus ori;
+        public java.util.List<Point> tip;
+        public ImagePlus im;
+        public ImageProcessor ip;
+        public ImagePlus ori;
+        JsonObject jobj;
 
         PixelCount(ImagePlus im0, ImagePlus ori0) {
 
@@ -32,10 +36,9 @@
             ori = ori0.duplicate();
             ip = im.getProcessor();
             ip.autoThreshold();
-            double[] params = new params[1];
             //ip.invert();
 
-            tip = new List<>();
+            tip = new ArrayList<>();
             int nTips = 0;
             for (int w = 0; w < ip.getWidth(); w++) {
                 for (int h = 0; h < ip.getHeight(); h++) {
@@ -49,7 +52,8 @@
                     }
                 }
             }
-            params[0] = nTips;
+            jobj = new JsonObject();
+            jobj.addProperty("nTips", nTips);
         }
 
         public ImagePlus overlay() {
@@ -61,6 +65,7 @@
                 ori.setOverlay(over);
                 ori = ori.flatten();
             }
+            return ori;
         }
 
     }

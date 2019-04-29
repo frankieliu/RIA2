@@ -15,7 +15,7 @@ public class DirectionalityAnalysis {
     public ImageProcessor ip;
     public ResultsTable rt;
 
-    private void DirectionalityAnalysis(ImagePlus im){
+    DirectionalityAnalysis(ImagePlus im){
         this.im = im.duplicate();
         ip = im.getProcessor();
         ip.autoThreshold();

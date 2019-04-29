@@ -308,8 +308,8 @@ public class Directionality implements PlugIn {
 	 * <ol>
 	 * 	<li> grabs the current ImagePlus
 	 * 	<li> displays the user dialog and sets setting fields accordingly
-	 * 	<li> calls the {@link #computesHistograms()} method, which computes the histograms
-	 * 	<li> calls the {@link #fitHistograms()} method, which fits the histograms
+	 * 	<li> calls the {@link this.computesHistograms()} method, which computes the histograms
+	 * 	<li> calls the {@link this.fitHistograms()} method, which fits the histograms
 	 * 	<li> display the results
 	 * </ol>
 	 * <p>
@@ -445,13 +445,13 @@ public class Directionality implements PlugIn {
 
 		// Prepare result holder
 		int n_slices = imp.getStackSize();
-		histograms = new ArrayList<double[]>(n_slices * imp.getNChannels()); 
+		histograms = new ArrayList<>(n_slices * imp.getNChannels());
 		if (build_orientation_map) {
 			orientation_map = new ImageStack(imp.getWidth(), imp.getHeight());
 		}
 		
 		// Loop over each slice
-		ImageProcessor ip = null;
+		ImageProcessor ip;
 		double[] dir = null;
 		for (int i = 0; i < n_slices; i++) {
 			slice_index = i;
@@ -562,11 +562,11 @@ public class Directionality implements PlugIn {
 		if (null == histograms)
 			return null;
 		
-		final ArrayList<double[]> fit_analysis = new ArrayList<double[]>(histograms.size());
+		final ArrayList<double[]> fit_analysis = new ArrayList<>(histograms.size());
 		double[] gof = getGoodnessOfFit();
-		double[] params = null;
-		double[] dir = null;
-		double[] analysis = null;
+		double[] params;
+		double[] dir;
+		double[] analysis;
 		double amount, center, std, xn;
 		
 		for (int i = 0; i < histograms.size(); i++) {
@@ -611,7 +611,7 @@ public class Directionality implements PlugIn {
 		if (null == histograms)
 			return;
 		
-		params_from_fit = new ArrayList<double[]>(histograms.size());
+		params_from_fit = new ArrayList<>(histograms.size());
 		goodness_of_fit = new double[histograms.size()];
 		double[] dir;
 		double[] init_params = new double[4];
@@ -762,7 +762,7 @@ public class Directionality implements PlugIn {
 	 * Return the parameters of the gaussian fit of the main peak in histogram. Results
 	 * are arranged in an ArrayList of double[], one array per slice analyzed.
 	 * If the fit was not done prior to this method call, it is called. If the 
-	 * method {@link #computesHistograms()} was not called, null is returned.
+	 * method {@link this.computesHistograms()} was not called, null is returned.
 	 * <p>
 	 * The double array is organized as follow, for the fitting model y = a + (b-a)*exp(-(x-c)*(x-c)/(2*d*d))
 	 * <ol start=0>
@@ -773,7 +773,7 @@ public class Directionality implements PlugIn {
 	 * </ul>
 	 *  
 	 * @return  the fitting parameters
-	 * @see {@link #getGoodnessOfFit()}, {@link #getHistograms()}, {@link #getBins()}
+	 * @see {@link this.getGoodnessOfFit()}, {@link this.getHistograms()}, {@link this.getBins()}
 	 */
 	public ArrayList<double[]> getFitParameters() {
 		if (null == params_from_fit) {
@@ -785,8 +785,8 @@ public class Directionality implements PlugIn {
 	/** 
 	 * Return the goodness of fit for the gaussian fit; 1 is good, 0 is bad. One value per slice.
 	 * If the fit was not done prior to this method call, it is called. If the 
-	 * method {@link #computesHistograms()} was not called, null is returned.
-	 * @see {@link #getFitParameters()}, {@link #getHistograms()}, {@link #getBins()}
+	 * method {@link this.computesHistograms()} was not called, null is returned.
+	 * @see {@link this.getFitParameters()}, {@link this.getHistograms()}, {@link this.getBins()}
 	 * @return the goodness of fit
 	 */
 	public double[] getGoodnessOfFit() {
@@ -799,8 +799,8 @@ public class Directionality implements PlugIn {
 	/**
 	 * Return the directionality histograms as an ArrayList of double[], one array
 	 * per slice.
-	 * @see {@link #getBins()}, {@link #getFitParameters()}, {@link #getGoodnessOfFit()}
-	 * @return  the directionality histograms; is null if the method {@link #computesHistograms()} 
+	 * @see {@link this.getBins()}, {@link this.getFitParameters()}, {@link this.getGoodnessOfFit()}
+	 * @return  the directionality histograms; is null if the method {@link this.computesHistograms()}
 	 * was not called before.
 	 */
 	public ArrayList<double[]> getHistograms() {
@@ -809,7 +809,7 @@ public class Directionality implements PlugIn {
 	
 	/**
 	 * Return the center of the bins for the directionality histograms. They are in degrees.
-	 * @see {@link #getHistograms()}, {@link #getFitParameters()}, {@link #getGoodnessOfFit()}
+	 * @see {@link this.getHistograms()}, {@link #getFitParameters()}, {@link this.getGoodnessOfFit()}
 	 * @return  the bin centers, in degrees
 	 */
 	public double[] getBins() {
@@ -831,7 +831,7 @@ public class Directionality implements PlugIn {
 	
 	/**
 	 * Return the current number of bins for this instance.
-	 * @return
+	 * @return number of bins
 	 */
 	public int getBinNumber() {
 		return nbins;
@@ -854,7 +854,7 @@ public class Directionality implements PlugIn {
 	
 	/**
 	 * Set the desired method for analysis. This resets the {@link #histograms} field to null.
-	 * @see {@link AnalysisMethod}
+	 * @see {@link this.AnalysisMethod}
 	 */
 	public void setMethod(AnalysisMethod method) {
 		this.method = method;
@@ -863,7 +863,7 @@ public class Directionality implements PlugIn {
 	
 	/**
 	 * Return the analysis method used by this instance.
-	 * @return
+	 * @return method
 	 */
 	public AnalysisMethod getMethod() {
 		return method;
@@ -1027,7 +1027,7 @@ public class Directionality implements PlugIn {
 	 * @see #fourier_component(FloatProcessor)
 	 *  
 	 */
-	private final double[] local_gradient_orientation(final FloatProcessor ip) {
+	final double[] local_gradient_orientation(final FloatProcessor ip) {
 //		double[] dir = new double[nbins]; // histo with #bins
 		final double[] norm_dir = new double[nbins]; // histo from -pi to pi;
 		final FloatProcessor grad_x = (FloatProcessor) ip.duplicate();
@@ -1112,9 +1112,9 @@ public class Directionality implements PlugIn {
 	 * <p>
 	 * We return the results as a double array, containing the amount of orientation for each angles
 	 * specified in the {@link #bins} field. 
-	 * @see {@link #local_gradient_orientation(FloatProcessor)}
+	 * @see {@link this.local_gradient_orientation(FloatProcessor)}
 	 */
-	private final double[] fourier_component(FloatProcessor ip) {
+	final double[] fourier_component(FloatProcessor ip) {
 		final Roi original_square = new Roi((pad_size-small_side)/2, (pad_size-small_side)/2, small_side, small_side); 
 				
 		float[] fpx, spectrum_px;
@@ -1287,9 +1287,9 @@ public class Directionality implements PlugIn {
 	 * to determine the image filter size. As such, they must be set before calling this method.
 	 * 
 	 * @return  an {@link ImageStack} made of each individual angular filter
-	 * @see {@link #fourier_component(FloatProcessor)}, {@link #prepareBins()}
+	 * @see {@link this.fourier_component(FloatProcessor)}, {@link this.prepareBins()}
 	 */
-	private final ImageStack makeFftFilters() {
+	final ImageStack makeFftFilters() {
 		final ImageStack filters = new ImageStack(pad_size, pad_size, nbins);
 		float[] pixels;
 		
@@ -1298,7 +1298,7 @@ public class Directionality implements PlugIn {
 		
 		double current_r, current_theta, theta_c, angular_part, radial_part;
 		final double theta_bw = Math.PI/(nbins-1);
-		final double r_c = pad_size / 4;
+		final double r_c = pad_size / 4.0;
 		final double r_bw = r_c/2;
 				
 		for (int i=1; i<= nbins; i++) {
@@ -1348,7 +1348,7 @@ public class Directionality implements PlugIn {
 	 * 
 	 * @return  a String array with the names
 	 */
-	private final String[] makeNames() {
+	final String[] makeNames() {
 		final int n_slices = imp.getStack().getSize();
 		String[] names;
 		String label;
@@ -1357,11 +1357,11 @@ public class Directionality implements PlugIn {
 			for (int i=0; i<n_slices; i++) {
 				label = imp.getStack().getShortSliceLabel(i+1);
 				if (null == label) {				
-					names[0+i*3] = "Slice_"+(i+1)+"R";
+					names[i*3] = "Slice_"+(i+1)+"R";
 					names[1+i*3] = "Slice_"+(i+1)+"G";
 					names[2+i*3] = "Slice_"+(i+1)+"B";
 				} else {
-					names[0+i*3] = label+"_R";
+					names[i*3] = label+"_R";
 					names[1+i*3] = label+"_G";
 					names[2+i*3] = label+"_B";					
 				}
@@ -1468,7 +1468,7 @@ public class Directionality implements PlugIn {
 	
 	/**
 	 * Utility method to analyze the content of the argument string passed by ImageJ to 
-	 * this plugin using the {@link #setup(String, ImagePlus)} method. Not as clever as it
+	 * this plugin using the {@link this.setup(String, ImagePlus)} method. Not as clever as it
 	 * could be.
 	 * @param  argument_string  the argument string to parse
 	 * @param  command_str  the command to search for

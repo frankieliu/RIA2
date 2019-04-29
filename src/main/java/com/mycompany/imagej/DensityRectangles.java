@@ -10,64 +10,64 @@ import ij.measure.ResultsTable;
 import ij.plugin.filter.Analyzer;
 import ij.plugin.filter.ParticleAnalyzer;
 import ij.process.ImageProcessor;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonArray;
 
 import java.awt.*;
 
 public class DensityRectangles {
 
-    public float area, depth, width, Ymid, Xmid;
-    public float[] dMod = {0.25f, 0.5f, 0.75f, 1f};
+    public double[] dMod = {0.25f, 0.5f, 0.75f, 1f};
     // public float[] dMod = {0, 0.2f, 0.4f, 0.6f};
     public Roi[] roi = new OvalRoi[dMod.length];
-    public float[] params = new float[dMod.length];
     public ImagePlus im;
     public ImageProcessor ip;
-    public ResultsTable rt;
+    public JsonObject jobj = new JsonObject();
 
     /**
      *
-     * @param im
-     * @param name
+     * @param im0 input image
+     * @param geo Geom object
      */
-    private void DensityRectangles(ImagePlus im) {
-        this.im = im.duplicate();
-        ip = this.im.getProcessor();
-        rt = new ResultsTable();
+    DensityRectangles(ImagePlus im0, Geom geo) {
+        im = im0.duplicate();
+        ip = im.getProcessor();
+        ResultsTable rt = new ResultsTable();
         Analyzer.setResultsTable(rt);
         ParticleAnalyzer pa;
 
         im.getProcessor().autoThreshold();
         im.getProcessor().invert();
-        float ar1 = 0;
+        JsonArray ja = new JsonArray();
+
         for (int i = 0; i < dMod.length; i++) {
-            roi[i] = new Roi((Xmid - 0.5 * width), Ymid + (dMod[i] * depth), width, 0.2 * depth);
+            roi[i] = new Roi((geo.xMid - 0.5 * geo.width), geo.yMid + (dMod[i] * geo.height), geo.width, 0.2 * geo.height);
             im.setRoi(roi[i]);
             rt.reset();
             pa = new ParticleAnalyzer(ParticleAnalyzer.CLEAR_WORKSHEET, Measurements.AREA, rt, 0, 10e9, 0, 1);
             pa.analyze(im);
 
-            ar1 = 0;
+            double ar1 = 0;
             for (int j = 0; j < rt.getCounter(); j++) {
-                ar1 += (float) rt.getValue("Area", j);
+                ar1 += rt.getValue("Area", j);
             }
-            params[i] = ar1 / area;
-
+            ja.add(ar1/geo.area);
         }
+        jobj.add("densityRectangles", ja);
     }
 
     public ImagePlus overlay() {
         //Create rectangles overlay
 
         im.getProcessor().invert();
-        for (int i = 0; i < roi.length; i++) {
-            roi[i].setStrokeColor(Color.blue);
-            roi[i].setStrokeWidth(5);
-            Overlay overlay = new Overlay(roi[i]);
+        for (Roi el: roi) {
+            el.setStrokeColor(Color.blue);
+            el.setStrokeWidth(5);
+            Overlay overlay = new Overlay(el);
             im.setOverlay(overlay);
             im = im.flatten();
         }
-        // IJ.save(im, dirParam.getAbsolutePath() + "/" + baseName + "_rectangles.tiff");
+        return im;
     }
-
 
 }

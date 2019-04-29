@@ -13,29 +13,19 @@ import ij.gui.Roi;
 import ij.gui.OvalRoi;
 import ij.gui.Overlay;
 import java.awt.Color;
+import com.google.gson.JsonObject;
 
 class Diameter {
     
-    public static ImagePlus addCircle(int w, int h, int r, ImagePlus ori) {
-        
-        Roi apex = new OvalRoi(w - r/2, h - r/2, r, r);
-        apex.setStrokeColor(Color.blue);
-        apex.setStrokeWidth(1);
-
-        Overlay overlay = new Overlay(apex); 
-        ori.setOverlay(overlay);
-        return ori.flatten(); 	 				
-    }
+    public ImagePlus im;
+    public ImageProcessor ip;
+    public JsonObject jobj;
 
     /**
      * Find max diameter, main stem, and root extents
-     * @param im = original image
+     * @param im0 = original image
      * @param skel = skeleton image
-     * @param params = output metrics
      */
-    ImagePlus im;
-    ImageProcessor ip;
-
     Diameter(ImagePlus im0, ImagePlus skel){
         im = im0.duplicate();
         EDM edm = new EDM();
@@ -43,7 +33,7 @@ class Diameter {
 		
 		// Create EDM mask
 		ip = this.im.getProcessor();
-		ip.autoThreshold();;
+		ip.autoThreshold();
 		//ip.invert();
 
 		edm.run(ip);
@@ -170,20 +160,30 @@ class Diameter {
         im.close();
 		skel.close();
 
-        float[] params = new float[11];
-        int counter = 0;
-		params[counter++] = (float) rt.getValue("Max", 0);
-		params[counter++] = (float) rt.getValue("Mean", 0);
-		params[counter++] = (float) rt.getValue("Mode", 0);
-        params[counter++] = (float) winit;
-        params[counter++] = (float) hinit;
-        params[counter++] = (float) maxLateral;
-        params[counter++] = (float) maxLateralX;
-        params[counter++] = (float) maxLateralY;
-        params[counter++] = (float) Math.sqrt(maxRadial);
-        params[counter++] = (float) maxRadialX;
-        params[counter++] = (float) maxRadialY;
-
-        return params;
+        jobj = new JsonObject();
+        jobj.addProperty("max", rt.getValue("Max", 0));
+        jobj.addProperty("mean", rt.getValue("Mean", 0));
+        jobj.addProperty("mode", rt.getValue("Mode", 0));
+        jobj.addProperty("winit", winit);
+        jobj.addProperty("hinit", hinit);
+        jobj.addProperty("maxLateral", maxLateral);
+        jobj.addProperty("maxLateralX", maxLateralX);
+        jobj.addProperty("maxLaterlaY", maxLateralY);
+        jobj.addProperty("maxRadial", Math.sqrt(maxRadial));
+        jobj.addProperty("maxRadialX", maxRadialX);
+        jobj.addProperty("maxRadialY", maxRadialY);
 	}
+
+    public static ImagePlus addCircle(int w, int h, int r, ImagePlus ori) {
+
+        Roi apex = new OvalRoi(w - r/2, h - r/2, r, r);
+        apex.setStrokeColor(Color.blue);
+        apex.setStrokeWidth(1);
+
+        Overlay overlay = new Overlay(apex);
+        ori.setOverlay(overlay);
+        return ori.flatten();
+    }
+
+
 }

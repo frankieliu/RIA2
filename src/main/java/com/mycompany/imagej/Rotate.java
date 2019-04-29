@@ -1,10 +1,5 @@
 package com.mycompany.imagej;
 
-/**
-* @author Guillaume Lobet | Forschungszentrum Jülich - Université catholique de Louvain
-*
-**/
-
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.io.File;
@@ -37,7 +32,7 @@ import com.mycompany.imagej.EllipticFD;
 class Rotate {
 	/**
 	 * 
-	 * @param im
+	 * @param im ImagePlus
 	 */
     public static double[] getWH(ImagePlus im) {
         double[] a = new double[2];
@@ -99,7 +94,7 @@ class Rotate {
         double vol = 0;
         for(int h = 0; h < ip.getHeight(); h++){
             int n = Line.extent(ip, h);
-            vol += (n * n / 4) * (Math.PI);
+            vol += (n * n / 4.0) * (Math.PI);
         }
         return vol;
     }
@@ -109,6 +104,7 @@ class Rotate {
 
         double angle = getAngle(im);
 
+        /*
         if (false) {
             IJ.run(im, "Select All", "");
             IJ.run(im, "Rotate...", "angle=" + angle);
@@ -117,6 +113,7 @@ class Rotate {
             IJ.run(im, "Canvas Size...", "width="+r.width+" height="+r.height+
                    " position=Center zero");
         }
+        */
 
         ImageProcessor ip = im.getProcessor();
         ip.setInterpolate(true);

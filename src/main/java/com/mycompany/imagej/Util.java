@@ -1,11 +1,5 @@
 package com.mycompany.imagej;
 
-/**
-* @author Guillaume Lobet | Forschungszentrum Jülich - Université catholique de Louvain
-**/
-
-
-
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
@@ -27,30 +21,30 @@ public final class Util {
 
 	/**
 	 * Return the sum of an array
-	 * @param vect
-	 * @return
+	 * @param vect Vector<> to be summed
+	 * @return the sum
 	 */
 	public static float sum(Vector<Float> vect){
 		float sum = 0;
-		for(int i = 0; i < vect.size(); i ++) sum = sum + vect.get(i);
+		for(float el: vect) sum = sum + el;
 		return 	sum;
 	}
 	
 	/**
 	 * Return the sum of an array
-	 * @param vect
-	 * @return
+	 * @param vect Vector<> to be summed
+	 * @return the sum
 	 */
 	public static float sum(float[] vect){
 		float sum = 0;
-		for(int i = 0; i < vect.length; i ++) sum = sum + vect[i];
+		for(float el: vect) sum = sum + el;
 		return 	sum;
 	}
 	
 	/**
 	 * Return the mean values of an array
-	 * @param vect
-	 * @return
+	 * @param vect Vector<> to be averaged
+	 * @return the average
 	 */
 	public static float avg(Vector<Float> vect){
 		return 	sum(vect)/vect.size();
@@ -58,8 +52,8 @@ public final class Util {
 	
 	/**
 	 * Return the mean values of an array
-	 * @param vect
-	 * @return
+	 * @param vect Vector<> to be averaged
+	 * @return the average
 	 */
 	public static float avg(float[] vect){
 		return 	sum(vect)/vect.length;
@@ -67,48 +61,48 @@ public final class Util {
 
 	/**
 	 * return the maximum of an array
-	 * @param vect
-	 * @return
+	 * @param vect Vector<> to be operated on
+	 * @return the max
 	 */
 	public static float max(Vector<Float> vect){
 		float max = 0;
-		for(int i = 0; i < vect.size(); i++) if(vect.get(i) > max) max = vect.get(i);
+		for(float el: vect) if(el > max) max = el;
 		return max;
 	}
 	
 	/**
 	 * return the minimum of an array
-	 * @param vect
-	 * @return
+	 * @param vect Vector<> to be operated on
+	 * @return the min
 	 */
 	public static float min(Vector<Float> vect){
 		float min = 10e9f;
-		for(int i = 0; i < vect.size(); i++) if(vect.get(i) < min) min = vect.get(i);
+		for(float el: vect) if(el < min) min = el;
 		return min;
 	}
 	
 	
 	/**
 	 * return the standart deviation of an array
-	 * @param vect
-	 * @return
+	 * @param vect Vector<> to be operated on
+	 * @return the std
 	 */
 	public static float std(Vector<Float> vect){
 		float sum = 0;
 		float avg = avg(vect);
-		for(int i = 0; i < vect.size(); i++) sum = sum + ((vect.get(i) - avg)*(vect.get(i) - avg));
+		for(float el: vect) sum = sum + ((el - avg)*(el - avg));
 		return (float) Math.sqrt(sum/vect.size());
 	}
 	
 	/**
 	 * return the standart deviation of an array
-	 * @param vect
-	 * @return
+	 * @param vect Vector<> to be operated on
+	 * @return the std
 	 */
 	public static float std(float[] vect){
 		float sum = 0;
 		float avg = avg(vect);
-		for(int i = 0; i < vect.length; i++) sum = sum + ((vect[i] - avg)*(vect[i] - avg));
+		for(float el: vect) sum = sum + ((el - avg)*(el - avg));
 		return (float) Math.sqrt(sum/vect.length);
 	}
 	
@@ -125,8 +119,8 @@ public final class Util {
 		try{ 
 			DateFormat formatter ; 
 			formatter = new SimpleDateFormat("yyyy-MM-dd");
-			start = (Date) formatter.parse(dateStart);
-			current = (Date) formatter.parse(dateCurent);
+			start = formatter.parse(dateStart);
+			current = formatter.parse(dateCurent);
 		} 
 		catch(Exception e){
 			System.out.println("getPlantAge failed"+e );
@@ -188,7 +182,7 @@ public final class Util {
 		cut = name.indexOf(begin);
 		if(cut != -1){
 			subName = name.substring(cut+begin.length(), l);
-			cut = (subName.indexOf(end) > -1) ? subName.indexOf(end) : subName.length();
+			cut = subName.contains(end) ? subName.indexOf(end) : subName.length();
 			subSubName = subName.substring(0, cut);
 			return (subSubName.length() > 0) ? subSubName : "0000";
 		}	
@@ -213,7 +207,7 @@ public final class Util {
 	public static PrintWriter initializeCSV(String folder){	
 		
 		// Create the connection
-		PrintWriter pw = null;
+		PrintWriter pw;
 		try{ pw = new PrintWriter(new FileWriter(folder)); }
 		catch(IOException e){
 			IJ.log("Could not save file "+folder);
@@ -256,11 +250,11 @@ public final class Util {
 	
 	/**
 	 * Get an array of String from a String with the form "1,2,3,4"
-	 * @param s
-	 * @return
+	 * @param s a string
+	 * @return a string array
 	 */
 	public static ArrayList<String> getArrayFromString(String s, String sep, boolean last){
-		ArrayList<String> al = new ArrayList<String>();
+		ArrayList<String> al = new ArrayList<>();
 		
 		int index = s.indexOf(sep);
 		while(index >= 0){
@@ -275,13 +269,13 @@ public final class Util {
 	
 	/**
 	 * Get an array of String from a String with the form "1,2,3,4"
-	 * @param s
-	 * @return
+	 * @param s a string array
+	 * @return a single string
 	 */
 	public static String getStringFromArray(ArrayList<String> s, String sep){		
 		String st = "";
-		for(int i = 0; i < s.size(); i++){
-			st = st.concat(s.get(i));
+		for(String el: s){
+			st = st.concat(el);
 			st = st.concat(sep);
 		}
 		return st;

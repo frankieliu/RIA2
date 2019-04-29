@@ -1,10 +1,5 @@
 package com.mycompany.imagej;
 
-/**
-* @author Guillaume Lobet | Forschungszentrum Jülich - Université catholique de Louvain
-*
-**/
-
 import java.awt.Color;
 import java.awt.Rectangle;
 import java.io.File;
@@ -134,22 +129,26 @@ public class RootAnalysis {
 	 * Perform the analysis of all the images
 	 */
 	public void analyze(){
-		
-		ImagePlus nextImage = null;
+
+		ImagePlus nextImage;
 		
         // Get all the images files in the directory
+
 		images = dirAll.listFiles();
-		for(int i = 0; i< images.length; i++) if(images[i].isHidden()) images[i].delete();
+		// for (File el : images) if (el.isHidden()) el.delete();
+
 		images = dirAll.listFiles(new FilenameFilter() {
-		    public boolean accept(File dir, String name) {
-		        return name.toLowerCase().endsWith(".jpg") || name.toLowerCase().endsWith(".tiff") || 
-		        		name.toLowerCase().endsWith(".tif") || name.toLowerCase().endsWith(".jpeg") ||
-		        		 name.toLowerCase().endsWith(".png");
-		    }
+			public boolean accept(File dir, String name) {
+				return name.toLowerCase().endsWith(".jpg") ||
+						name.toLowerCase().endsWith(".tiff") ||
+						name.toLowerCase().endsWith(".tif") ||
+						name.toLowerCase().endsWith(".jpeg") ||
+						name.toLowerCase().endsWith(".png");
+			}
 		});
 
 		// Counter for the processing time
-		IJ.log("Root image analysis started: "+dirAll.getAbsolutePath().toString());
+		IJ.log("Root image analysis started: "+dirAll.getAbsolutePath());
 		long startD = System.currentTimeMillis(); 
 		int counter = 0;	
 
@@ -179,7 +178,7 @@ public class RootAnalysis {
 		
 		// Navigate the different images in the time serie
 		int percent = 0;
-	    float progression = 0;
+	    double progression;
 		for(int i = 0; i < images.length; i++){
 			
 			long startD1 = System.currentTimeMillis();
@@ -187,7 +186,7 @@ public class RootAnalysis {
 			// Open the image
 			nextImage = IJ.openImage(images[i].getAbsolutePath());
 			
-			progression = (i/images.length)*100;
+			progression = ((double) i/images.length)*100;
   		  	if(progression > percent){    			
   			  IJ.log(percent+" % of the rsml files converted. "+(images.length-i)+" files remaining.");
   			  System.out.println(percent+" % of the rsml files converted. "+(images.length-i)+" files remaining.");
@@ -208,7 +207,7 @@ public class RootAnalysis {
 			}catch(Exception e){
 			    System.out.println("I am at the exception handling routine");
 			    e.printStackTrace(System.out);
-				System.out.println(e);
+				System.out.println(e.toString());
 			}
 			// Close the current image
 			nextImage.flush(); nextImage.close(); 
@@ -318,7 +317,7 @@ public class RootAnalysis {
 
         Rotate.getVolume(currentImage.duplicate());
             
-        Geometry geo = new Geometry(currentImage.duplicate(), skelImage.duplicate());
+        Geometry gy = new Geometry(currentImage.duplicate(), skelImage.duplicate());
         
         // getDensityEllipses(currentImage.duplicate());
 
@@ -330,11 +329,11 @@ public class RootAnalysis {
 		
         // getPixelsCount(skelImage.duplicate(), currentImage.duplicate());
         
-        getPixelProfiles(skelImage.duplicate());
+        PixelProfile pp = new PixelProfile(skelImage, gy.geo);
 
-        getConvexHull(currentImage.duplicate(), saveEFD);
+        ConvexHull ch = new ConvexHull(currentImage.duplicate(), saveEFD);
      
-        getCoordinates(currentImage.duplicate());
+        Coordinates co = new Coordinates(currentImage.duplicate(), gy.geo);
 
         // Frankie:
         DepthProfile dp = new DepthProfile(currentImage.duplicate(), skelImage.duplicate());
@@ -351,7 +350,8 @@ public class RootAnalysis {
 
 	/**
 	 * 
-	 * @param im
+	 * @param im input image
+	 * @param skel skeleton of image
 	 */
 	private void getDiameters(ImagePlus im, ImagePlus skel){
 		
@@ -362,7 +362,7 @@ public class RootAnalysis {
 		
 		// Create EDM mask
 		ImageProcessor ip = im.getProcessor();
-		ip.autoThreshold();;
+		ip.autoThreshold();
 		//ip.invert();
 
         // Frankie: added this to show result of EDM
@@ -389,9 +389,7 @@ public class RootAnalysis {
         // Frankie
         // Calculate tissue volume
         // Calculate histogram
-        
-        
-        
+
 		IJ.setThreshold(im, 1, 255);
 		Analyzer.setResultsTable(rt);
 		rt.reset();
@@ -406,161 +404,6 @@ public class RootAnalysis {
 		im.close();
 		skel.close();
 	}
-
-
-	/**
-	 * 
-	 * @param im
-	 */
-
-
-	/**
-	 * 
-	 * @param im
-	 */
-	private void getPixelProfiles(ImagePlus im){
-		if(verbatim) IJ.log("------- Pixel profiles");
-		float sum, count, max, tot;
-		int inc = (int) depth / nSlices;
-		
-	    im.getProcessor().autoThreshold();
-	    
-		for(int j = 0; j < nSlices; j++){
-			
-			sum = 0;
-			count = 0;
-			max = 0;
-			tot = 0;
-			
-			for(int i = ((j+1) * inc)+(int) bY; i > j * inc; i = i-2){
-				Rectangle roi = new Rectangle((int) bX, i, (int) width, 1);
-				im.setRoi(roi);
-				Analyzer.setResultsTable(rt);
-				rt.reset();
-				an = new Analyzer(im, Measurements.AREA | Measurements.AREA_FRACTION, rt);
-			    an.measure();
-			    tot = (float) ((rt.getValue("%Area", 0)/100) * rt.getValue("Area", 0));
-				if(tot >= 0){
-					sum += (float) tot;
-					count++;
-				}
-				if(tot > max) max = (float) tot;				
-			} 
-			params[counter++] = sum / count;
-			params[counter++] = max;
-		}
-	
-		sum = 0;
-		count = 0;
-		max = 0;
-		
-		for(int i = (int) width ; i > 0; i = i-2){
-			Rectangle Rect2 = new Rectangle(i, 0, 1, (int) depth);
-			im.setRoi(Rect2);
-			Analyzer.setResultsTable(rt);
-			rt.reset();
-			an = new Analyzer(im, Measurements.AREA | Measurements.AREA_FRACTION, rt);
-		    an.measure();
-		    tot = (float) ((rt.getValue("%Area", 0)/100) * rt.getValue("Area", 0));
-			if(tot > 0){
-				sum += (float) tot;
-				count++;
-			}
-			if(tot > max) max = (float) tot;
-		}
-		params[counter++] = sum / count;
-		params[counter++] = max;
-		
-		im.close();
-	}
-
-	/**
-	 * 
-	 * @param im
-	 */
-	private void getCoordinates(ImagePlus im){
-		
-		if(verbatim) IJ.log("-------- Get Coordinates");
-		// Get bounding box
-        im.getProcessor().autoThreshold();
-        IJ.run(im, "Create Selection", "");
-        
-        Roi select;
-        select = im.getRoi();
-        ImageProcessor Shape = im.getProcessor();
-        Shape.setRoi(select.getBounds());
-        Shape = Shape.crop();
-        im.setProcessor(Shape);
-        float w = im.getWidth();
-        float h = im.getHeight();
-        int m = 2 * nCoord;
-
-        //Calculate coordinates
-        // Make rectangle (for each rectangle) 
-        // Get bounding box of rectangle
-		// Get coordinates of bounding box
-		// Save coordinates
-        
-        for(int i = 0; i < nCoord; i++){
-        	ImagePlus currentSelection = im.duplicate();
-        	float factor = (float) i / (nCoord - 1);
-        
-        	float y = Ymid;
-        	if(i == 0) y = 0.01f * h;//Ymid;
-        	else if(i == (nCoord - 1)) y = (float) (0.99 * h);
-        	else y = (float) (factor * h);
-        	
-        	currentSelection.setRoi(new Roi(0, y, w, 3));
-        	
-        	ImageProcessor small = currentSelection.getProcessor();
-        	small = small.crop();
-        	small.setAutoThreshold("Li");
-        	currentSelection.setProcessor(small);	
-        
-	        IJ.run(currentSelection, "Create Selection", "");        
-	        Analyzer.setResultsTable(rt);
-	        rt.reset();
-	        an = new Analyzer(currentSelection, Measurements.RECT, rt);
-	        an.measure();
-	         
-	     	xCoord[i] = (float) rt.getValue("BX", 0);
-	     	yCoord[i] = (float) y;
-	     
-	        int o = m - i - 1;
-	        xCoord[o] = (float) (rt.getValue("BX", 0) + rt.getValue("Width", 0));
-	     	yCoord[o] = (float) y;  
-	     	
-	     	// Get the width and the cumul width (inspired from Bucksch et al 2014, Plant Physiology)
-	     	diffCoord[i] = Math.abs(xCoord[i] - xCoord[o]) / w;
-	     	if(i == 0) cumulCoord[i] = diffCoord[i];
-	     	else cumulCoord[i] = cumulCoord[i-1] + diffCoord[i];
-        	
-        }
-        
-        if(saveImages){
-	        // Make shape
-	     	PolygonRoi shapeROI = new PolygonRoi(xCoord,yCoord, Roi.FREEROI);
-	     	shapeROI.setStrokeColor(Color.blue);
-		    shapeROI.setStrokeWidth(5);
-		    Overlay overlay = new Overlay(shapeROI); 
-		    im.setOverlay(overlay); 
-		    im = im.flatten(); 
-	  
-		    // Save the images for post-processing check
-		    IJ.save(im, dirParam.getAbsolutePath()+"/"+baseName+"_shape.jpeg");   
-        }
-        
-        im.close();
-
-        if(saveTPS) sendShapeDataToTPS(xCoord, yCoord);
-
-        for(int i = 0; i < nCoord*2; i++) params[counter++] = xCoord[i] / w;
-        for(int i = 0; i < nCoord; i++) params[counter++] = diffCoord[i];
-        for(int i = 0; i < nCoord; i++) params[counter++] = cumulCoord[i];
-	}
-
-
-
 
 
 	/**
@@ -644,9 +487,12 @@ public class RootAnalysis {
 
 			String extension = getExtension(f);
 			if (extension != null) {
-				if (extension.equals("jpg") || extension.equals("png") ||
-						extension.equals("tif") || extension.equals("tiff") || extension.equals("jpeg")) return true;
-				else return false;
+				return (extension.equals("jpg")
+                        || extension.equals("png")
+                        || extension.equals("tif")
+                        || extension.equals("tiff")
+                        || extension.equals("jpeg"));
+
 			}
 			return false;
 		}

@@ -13,9 +13,8 @@ public class Bit {
         int[] bits = whichBit(n);
         for (Integer b: bits) {
             Integer[] many = m.get(b);
-            for (Integer el: many) {
+            for (Integer el: many)
                 out.add(el);
-            }
         }
         return out.stream().mapToInt(i-> i).toArray();
     }
