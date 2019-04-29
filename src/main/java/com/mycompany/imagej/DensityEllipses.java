@@ -1,5 +1,7 @@
 package com.mycompany.imagej;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.OvalRoi;
@@ -13,13 +15,12 @@ import java.awt.*;
 
 public class DensityEllipses {
 
-    public float area, depth, width, Ymid, Xmid;
     public float[] wMod = {0.125f, 0.25f, 0.375f, 0.5f};
     public float[] dMod = {0.25f, 0.5f, 0.75f, 1f};
     public OvalRoi[] roi = new OvalRoi[dMod.length];
-    public float[] params = new float[dMod.length];
+    public JsonObject jobj = new JsonObject();
 
-    public ImagePlus getDensityEllipses(ImagePlus im) {
+    DensityEllipses(ImagePlus im, Geom geo) {
 
         ParticleAnalyzer pa;
         ResultsTable rt = new ResultsTable();
@@ -28,8 +29,9 @@ public class DensityEllipses {
         im.getProcessor().autoThreshold();
         im.getProcessor().invert();
         float areaPrev = 0;
+        JsonArray ja = new JsonArray();
         for (int i = 0; i < 4; i++) {
-            roi[i] = new OvalRoi(Xmid - wMod[i] * width, Ymid, dMod[i] * width, dMod[i] * depth);
+            roi[i] = new OvalRoi(geo.xMid - wMod[i] * geo.width, geo.yMid, dMod[i] * geo.width, dMod[i] * geo.height);
             im.setRoi(roi[i]);
             rt.reset();
             pa = new ParticleAnalyzer(ParticleAnalyzer.CLEAR_WORKSHEET, Measurements.AREA, rt, 0, 10e9, 0, 1);
@@ -38,19 +40,19 @@ public class DensityEllipses {
             for (int j = 0; j < rt.getCounter(); j++) {
                 areaSelection += (float) rt.getValue("Area", j);
             }
-            float areaProp = (areaSelection - areaPrev) / area;
-            params[i] = areaProp;
+            double areaProp = (areaSelection - areaPrev) / geo.area;
+            ja.add(areaProp);
             areaPrev = areaSelection;
         }
-        return im;
+        jobj.add("area",ja);
     }
 
     public ImagePlus overlay(ImagePlus im) {
         im.getProcessor().invert();
-        for (int i = 0; i < roi.length; i++) {
-            roi[i].setStrokeColor(Color.BLUE);
-            roi[i].setStrokeWidth(4);
-            Overlay Eloverlay = new Overlay(roi[i]);
+        for (OvalRoi r: roi){
+            r.setStrokeColor(Color.BLUE);
+            r.setStrokeWidth(4);
+            Overlay Eloverlay = new Overlay(r);
             im.setOverlay(Eloverlay);
             im = im.flatten();
         }
@@ -58,7 +60,4 @@ public class DensityEllipses {
         // IJ.save(im, dirParam.getAbsolutePath() + "/" + baseName + "_ellipses.tiff");
     }
 
-    public static void main(String[] args) {
-
-    }
 }
