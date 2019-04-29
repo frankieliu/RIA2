@@ -1,12 +1,10 @@
     package com.mycompany.imagej;
 
-    import ij.IJ;
     import ij.ImagePlus;
     import ij.gui.OvalRoi;
     import ij.gui.Overlay;
     import ij.gui.Roi;
     import ij.process.ImageProcessor;
-    import com.mycompany.imagej.Line;
 
     import com.google.gson.JsonObject;
     import java.awt.*;
@@ -32,9 +30,9 @@
         JsonObject jobj = new JsonObject();
 
         PixelCount(ImagePlus im0, ImagePlus ori0) {
-
             im = im0.duplicate();
             ori = ori0.duplicate();
+
             ip = im.getProcessor();
             ip.autoThreshold();
             //ip.invert();

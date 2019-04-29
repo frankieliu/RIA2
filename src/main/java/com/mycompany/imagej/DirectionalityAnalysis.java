@@ -16,6 +16,7 @@ public class DirectionalityAnalysis {
 
     DirectionalityAnalysis(ImagePlus im0, Geom geo){
         im = im0.duplicate();
+
         ip = im.getProcessor();
         ip.autoThreshold();
         ip.setRoi(new OvalRoi(geo.xMid - 0.45 * geo.width, geo.yMid, 0.9 * geo.width, 0.9 * geo.height));

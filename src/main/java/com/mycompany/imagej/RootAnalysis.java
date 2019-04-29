@@ -1,37 +1,20 @@
 package com.mycompany.imagej;
 
-import java.awt.Color;
-import java.awt.Rectangle;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.PrintWriter;
 
 import ij.IJ;
 import ij.ImagePlus;
-import ij.gui.OvalRoi;
-import ij.gui.Overlay;
-import ij.gui.PolygonRoi;
-import ij.gui.Roi;
 import ij.plugin.ImageCalculator;
 import ij.plugin.filter.Analyzer;
 import ij.plugin.filter.EDM;
 import ij.process.BinaryProcessor;
 import ij.process.ByteProcessor;
 import ij.plugin.filter.ParticleAnalyzer;
-import ij.plugin.frame.RoiManager;
 import ij.process.ImageProcessor;
-import ij.process.FloatPolygon;
 import ij.measure.Calibration;
 import ij.measure.Measurements;
 import ij.measure.ResultsTable;
-
-import com.mycompany.imagej.Directionality;
-import com.mycompany.imagej.EllipticFD;
-import com.mycompany.imagej.Diameter;
-import com.mycompany.imagej.Tissue;
-import com.mycompany.imagej.Rotate;
-import com.mycompany.imagej.Geometry;
-
 
 public class RootAnalysis {
 	
@@ -56,7 +39,6 @@ public class RootAnalysis {
     
     // Tools
 	static ResultsTable rt = new ResultsTable();
-	static PrintWriter pwParam, pwTPS, pwEFD, pwAnalysis;
 
     // Frankie
     static boolean saveDepth;
@@ -312,31 +294,17 @@ public class RootAnalysis {
         // Get area of the root system
 
         Diameter dia = new Diameter(currentImage, skelImage);
-
         Tissue ts = new Tissue(currentImage, skelImage);
-
         Rotate.getVolume(currentImage);
-            
         Geometry gy = new Geometry(currentImage, skelImage);
-        
-        // getDensityEllipses(im.duplicate());
-
-        // getDensityRectangles(im.duplicate());
-
-        // getDirectionality(im.duplicate());
-        
-        // -- getWhiteEllipses(im.duplicate());
-		
-        // getPixelsCount(skel.duplicate(), im.duplicate());
-        
+        DensityEllipses de = new DensityEllipses(currentImage, gy.geo);
+        DensityRectangles dr = new DensityRectangles(currentImage, gy.geo);
+        DirectionalityAnalysis da = new DirectionalityAnalysis(currentImage, gy.geo);
+        PixelCount pc = new PixelCount(skelImage, currentImage);
         PixelProfile pp = new PixelProfile(skelImage, gy.geo);
-
-        ConvexHull ch = new ConvexHull(currentImage.duplicate(), saveEFD);
-     
-        Coordinates co = new Coordinates(currentImage.duplicate(), gy.geo);
-
-        // Frankie:
-        DepthProfile dp = new DepthProfile(currentImage.duplicate(), skelImage.duplicate());
+        ConvexHull ch = new ConvexHull(currentImage, saveEFD);
+        Coordinates co = new Coordinates(currentImage, gy.geo);
+        DepthProfile dp = new DepthProfile(currentImage, skelImage);
         
         counter = 0;
         
@@ -405,111 +373,4 @@ public class RootAnalysis {
 		skel.close();
 	}
 
-
-	/**
-	 * Print Parameters CSV header
-	 */
-	private void printAnalysisCSVHeader(){	
-		String toPrint = "image";
-		toPrint = toPrint.concat(",width,height,time_start, time_end");
-		pwAnalysis.println(toPrint);
-		pwAnalysis.flush();
-	}	
-	
-	/**
-	 * Print Parameters CSV header
-	 */
-	private void sendAnalysisToCSV(String image, int width, int height, long time1, long time2){
-		String toPrint = image+","+width+","+height+","+time1+","+time2;
-		pwAnalysis.println(toPrint);
-		pwAnalysis.flush();
-	}		
-	
-	/**
-	 * Print Parameters CSV header
-	 */
-	private void printParamCSVHeader(){	
-		String toPrint = "image";
-		toPrint = toPrint.concat(",diam_max,diam_mean,diam_mode");
-		toPrint = toPrint.concat(",length,area,width,depth,width_depth_ratio,com_x,com_y");
-		toPrint = toPrint.concat(",ellips_025,ellips_050,ellips_075,ellips_100");
-		toPrint = toPrint.concat(",rect_020,rect_040,rect_060,rect_080");
-		toPrint = toPrint.concat(",directionality");
-		toPrint = toPrint.concat(",tip_count");
-		for(int i = 0; i < nSlices; i++) toPrint = toPrint.concat(",cross_hori_"+i+"_mean,cross_hori_"+i+"_max");
-		toPrint = toPrint.concat(",cross_vert_mean,cross_vert_max,convexhull");
-		for(int i = 0; i < nCoord * 2; i++) toPrint = toPrint.concat(",coord_x"+i);
-		for(int i = 0; i < nCoord; i++) toPrint = toPrint.concat(",diff_x"+i);
-		for(int i = 0; i < nCoord; i++) toPrint = toPrint.concat(",cumul_x"+i);
-
-		pwParam.println(toPrint);
-		pwParam.flush();
-	}
-
-
-	
-	/**
-	 * send Shape Data To CSV
-	 */
-	private void sendShapeDataToTPS(float[] coordX, float[] coordY){	
-		pwTPS.println("ID="+baseName);
-		pwTPS.println("LM="+(nCoord*2));
-		for(int i = 0; i < coordX.length; i++) pwTPS.println(coordX[i]+" "+coordY[i]);
-		pwTPS.flush();
-	}
-	
-	/**
-	 * Print EFD CSV header
-	 */
-	private void printEFDCSVHeader(){	
-		pwEFD.println("image, index, ax, ay, bx, by, efd");			
-		pwEFD.flush();
-	}
-	/**
-	 * Send EFD data to an CSV file
-	 */
-	private void sendEFDDataToCSV(int i, double ax, double ay, double bx, double by, double efd){	
-		pwEFD.println(baseName +","+ i +","+ ax +","+ ay +","+ bx+","+ by+","+ efd);
-		pwEFD.flush();
-	}
-	
-	
-	
-   /**
-    * Image filter	
-    * @author guillaumelobet
-    */
-	public class ImageFilter extends javax.swing.filechooser.FileFilter{
-		public boolean accept (File f) {
-			if (f.isDirectory()) {
-				return true;
-			}
-
-			String extension = getExtension(f);
-			if (extension != null) {
-				return (extension.equals("jpg")
-                        || extension.equals("png")
-                        || extension.equals("tif")
-                        || extension.equals("tiff")
-                        || extension.equals("jpeg"));
-
-			}
-			return false;
-		}
-	     
-		public String getDescription () {
-			return "Image files (*.jpg, *png, *tiff)";
-		}
-	      
-		public String getExtension(File f) {
-			String ext = null;
-			String s = f.getName();
-			int i = s.lastIndexOf('.');
-			if (i > 0 &&  i < s.length() - 1) {
-				ext = s.substring(i+1).toLowerCase();
-			}
-			return ext;
-		}
-	}	
-	
 }
