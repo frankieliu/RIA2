@@ -137,15 +137,15 @@ public class RootAnalysis {
 		images = dirAll.listFiles();
 		// for (File el : images) if (el.isHidden()) el.delete();
 
-		images = dirAll.listFiles(new FilenameFilter() {
-			public boolean accept(File dir, String name) {
-				return name.toLowerCase().endsWith(".jpg") ||
-						name.toLowerCase().endsWith(".tiff") ||
-						name.toLowerCase().endsWith(".tif") ||
-						name.toLowerCase().endsWith(".jpeg") ||
-						name.toLowerCase().endsWith(".png");
-			}
-		});
+        images = dirAll.listFiles((file) -> {
+            String name = file.getName();
+            return name.toLowerCase().endsWith(".jpg")
+                    || name.toLowerCase().endsWith(".tiff")
+                    || name.toLowerCase().endsWith(".tif")
+                    || name.toLowerCase().endsWith(".jpeg")
+                    || name.toLowerCase().endsWith(".png");
+        });
+
 
 		// Counter for the processing time
 		IJ.log("Root image analysis started: "+dirAll.getAbsolutePath());
@@ -307,27 +307,27 @@ public class RootAnalysis {
 		skelImage.setRoi(0, 0, ip.getWidth(), ip.getHeight());
 		currentImage.setRoi(0, 0, ip.getWidth(), ip.getHeight());
 		
-		// skelImage.show(); currentImage.show();
+		// skel.show(); im.show();
 		
         // Get area of the root system
 
         Diameter dia = new Diameter(currentImage, skelImage);
 
-        Tissue.getTissue(currentImage.duplicate(), skelImage.duplicate()) ;
+        Tissue ts = new Tissue(currentImage, skelImage);
 
-        Rotate.getVolume(currentImage.duplicate());
+        Rotate.getVolume(currentImage);
             
-        Geometry gy = new Geometry(currentImage.duplicate(), skelImage.duplicate());
+        Geometry gy = new Geometry(currentImage, skelImage);
         
-        // getDensityEllipses(currentImage.duplicate());
+        // getDensityEllipses(im.duplicate());
 
-        // getDensityRectangles(currentImage.duplicate());
+        // getDensityRectangles(im.duplicate());
 
-        // getDirectionality(currentImage.duplicate());
+        // getDirectionality(im.duplicate());
         
-        // -- getWhiteEllipses(currentImage.duplicate());
+        // -- getWhiteEllipses(im.duplicate());
 		
-        // getPixelsCount(skelImage.duplicate(), currentImage.duplicate());
+        // getPixelsCount(skel.duplicate(), im.duplicate());
         
         PixelProfile pp = new PixelProfile(skelImage, gy.geo);
 

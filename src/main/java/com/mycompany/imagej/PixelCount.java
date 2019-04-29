@@ -24,11 +24,12 @@
             }
         }
 
-        public java.util.List<Point> tip;
         public ImagePlus im;
         public ImageProcessor ip;
         public ImagePlus ori;
-        JsonObject jobj;
+        public java.util.List<Point> tip;
+
+        JsonObject jobj = new JsonObject();
 
         PixelCount(ImagePlus im0, ImagePlus ori0) {
 
@@ -52,7 +53,6 @@
                     }
                 }
             }
-            jobj = new JsonObject();
             jobj.addProperty("nTips", nTips);
         }
 

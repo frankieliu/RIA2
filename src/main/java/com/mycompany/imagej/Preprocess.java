@@ -18,18 +18,16 @@ public class Preprocess {
     public double scaleCm = 23.5f;
     public double rootMinSize = 50;
     public boolean blackRoots = true;
-    public double scale;
-    public ImagePlus currentImage;
-    public ImagePlus skelImage;
+    // Resize the image to speed up the analysis (resize to width = 800)
+    public double scale = scalePix/scaleCm;
 
+    public ImagePlus im;
+    public ImagePlus skel;
 
-    public Preprocess(ImagePlus current) {
-        currentImage = current.duplicate();
-        ImageProcessor ip = currentImage.getProcessor();
+    public Preprocess(ImagePlus im0) {
+        im = im0.duplicate();
+        ImageProcessor ip = im.getProcessor();
         ResultsTable rt = new ResultsTable();
-
-        // Resize the image to speed up the analysis (resize to width = 800)
-        scale = scalePix / scaleCm;
 
         // Convert to 8bit image if needed
         if (ip.getBitDepth() != 8) ip = ip.convertToByte(true);
@@ -42,17 +40,17 @@ public class Preprocess {
 
         // Threshold the image (used to be Otsu
         ip.setAutoThreshold("Default");
-        currentImage.setProcessor(ip);
+        im.setProcessor(ip);
 
         // Remove small particles in the image
         ParticleAnalyzer pa;
         pa = new ParticleAnalyzer(ParticleAnalyzer.SHOW_MASKS, Measurements.AREA, rt, rootMinSize, 10e9, 0, 1);
-        pa.analyze(currentImage);
+        pa.analyze(im);
 
         // Get the mask from the ParticuleAnalyser
-        currentImage = IJ.getImage();
-        currentImage.hide(); // Hide the mask, we do not want to display it.
-        ip = currentImage.getProcessor();
+        im = IJ.getImage();
+        im.hide(); // Hide the mask, we do not want to display it.
+        ip = im.getProcessor();
 
         // Reset calibration
         // This is needed in case the image was previously calibrated using ImageJ.
@@ -61,25 +59,27 @@ public class Preprocess {
         calDefault.setUnit("px");
         calDefault.pixelHeight = 1;
         calDefault.pixelWidth = 1;
-        currentImage.setCalibration(calDefault);
+        im.setCalibration(calDefault);
 
         // Create skeleton
-        skelImage = new ImagePlus();
+        skel = new ImagePlus();
         BinaryProcessor bp = new BinaryProcessor(new ByteProcessor(ip, true));
         //for(int i = 0; i < 5; i++) bp.smooth(); // Smooth the image for a better skeletonisation
         bp.autoThreshold();
         bp.skeletonize();
         //bp.invert();
-        skelImage.setProcessor(bp);
+        skel.setProcessor(bp);
 
-        // if(saveImages) IJ.save(skelImage, dirParam.getAbsolutePath()+"/"+baseName+"_skeleton.tiff");
+        // if(saveImages) IJ.save(skel, dirParam.getAbsolutePath()+"/"+baseName+"_skeleton.tiff");
 
 
-        skelImage.setRoi(0, 0, ip.getWidth(), ip.getHeight());
-        currentImage.setRoi(0, 0, ip.getWidth(), ip.getHeight());
+        skel.setRoi(0, 0, ip.getWidth(), ip.getHeight());
+        im.setRoi(0, 0, ip.getWidth(), ip.getHeight());
 
-        // skelImage.show(); currentImage.show();
+        // skel.show(); im.show();
 
     }
 
+    public boolean isBlackRoots() { return blackRoots; }
+    public void setBlackRoots(boolean blackRoots) { this.blackRoots = blackRoots; }
 }

@@ -1,33 +1,12 @@
 package com.mycompany.imagej;
 
-import java.awt.Color;
-import java.awt.Rectangle;
-import java.io.File;
-import java.io.FilenameFilter;
-import java.io.PrintWriter;
-import java.lang.Math;
-
 import ij.IJ;
 import ij.ImagePlus;
-import ij.gui.OvalRoi;
-import ij.gui.Overlay;
-import ij.gui.PolygonRoi;
 import ij.gui.Roi;
-import ij.plugin.ImageCalculator;
-import ij.plugin.filter.Analyzer;
-import ij.plugin.filter.EDM;
-import ij.process.BinaryProcessor;
-import ij.process.ByteProcessor;
-import ij.plugin.filter.ParticleAnalyzer;
-import ij.plugin.frame.RoiManager;
 import ij.process.ImageProcessor;
-import ij.process.FloatPolygon;
-import ij.measure.Calibration;
-import ij.measure.Measurements;
-import ij.measure.ResultsTable;
 
-import com.mycompany.imagej.Directionality;
-import com.mycompany.imagej.EllipticFD;
+import java.awt.Rectangle;
+import java.lang.Math;
 
 class Rotate {
 	/**
