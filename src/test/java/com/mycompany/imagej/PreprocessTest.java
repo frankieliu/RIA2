@@ -9,8 +9,6 @@ import java.util.Scanner;
 
 import java.io.File;
 
-import static org.junit.jupiter.api.Assertions.*;
-
 class PreprocessTest {
     File file;
     ImagePlus nextImage;
@@ -25,8 +23,8 @@ class PreprocessTest {
         nextImage = IJ.openImage(file.getAbsolutePath());
         Preprocess pp = new Preprocess(nextImage);
         nextImage.show();
-        pp.currentImage.show();
-        pp.skelImage.show();
+        pp.im.show();
+        pp.skel.show();
 
         Scanner scanner = new Scanner(System.in);
         String myString = scanner.next();
