@@ -1,5 +1,6 @@
 package com.mycompany.imagej;
 
+import com.google.gson.JsonObject;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.OvalRoi;
@@ -9,17 +10,15 @@ import ij.process.ImageProcessor;
 
 public class DirectionalityAnalysis {
 
-    public float area, depth, width, Ymid, Xmid;
-    public float[] params = new float[1];
     public ImagePlus im;
     public ImageProcessor ip;
-    public ResultsTable rt;
+    public JsonObject jobj = new JsonObject();
 
-    DirectionalityAnalysis(ImagePlus im){
-        this.im = im.duplicate();
+    DirectionalityAnalysis(ImagePlus im0, Geom geo){
+        im = im0.duplicate();
         ip = im.getProcessor();
         ip.autoThreshold();
-        ip.setRoi(new OvalRoi(Xmid - 0.45 * width, Ymid, 0.9 * width, 0.9 * depth));
+        ip.setRoi(new OvalRoi(geo.xMid - 0.45 * geo.width, geo.yMid, 0.9 * geo.width, 0.9 * geo.height));
         im.setProcessor(ip);
         Directionality dnlty = new Directionality();
 
@@ -50,11 +49,9 @@ public class DirectionalityAnalysis {
                 tot += prop;
             }
         }
-
-        params[0] = (float) (angle / tot);
         rs.reset();
 
-        im.close();
+        jobj.addProperty("anglePropotion", angle / tot);
     }
 
 }

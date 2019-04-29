@@ -22,7 +22,7 @@ public class ConvexHull {
     public ImageProcessor ip;
     public Roi select;
     public ImagePlus chImage;
-    public JsonObject jobj;
+    public JsonObject jobj = new JsonObject();
     public int nEFD = 30;
 
     ConvexHull(ImagePlus im0, boolean efd){
@@ -68,7 +68,6 @@ public class ConvexHull {
         pa = new ParticleAnalyzer(ParticleAnalyzer.CLEAR_WORKSHEET, Measurements.CENTER_OF_MASS |
                 Measurements.AREA, rt, 0, 10e9);
         pa.analyze(chImage);
-        jobj = new JsonObject();
         jobj.addProperty("area", rt.getValue("Area", 0));
     }
 

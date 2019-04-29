@@ -13,8 +13,11 @@ public class Bit {
         int[] bits = whichBit(n);
         for (Integer b: bits) {
             Integer[] many = m.get(b);
+            /*
             for (Integer el: many)
                 out.add(el);
+             */
+            out.addAll(Arrays.asList(many));
         }
         return out.stream().mapToInt(i-> i).toArray();
     }
@@ -25,7 +28,7 @@ public class Bit {
      */
     public static int[] whichBit(int n){
         List<Integer> out = new ArrayList<>();
-        int bit = 1;  // masking bit
+        int bit = 0b1;  // masking bit
         int counter = n;  // count down counter
         while (counter != 0) {
             if ((bit & n) > 0) {  // if bit is set

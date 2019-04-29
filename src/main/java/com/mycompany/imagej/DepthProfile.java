@@ -1,5 +1,7 @@
 package com.mycompany.imagej;
 
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.process.ImageProcessor;
@@ -7,28 +9,25 @@ import ij.process.ImageProcessor;
 public class DepthProfile {
 
     public ImagePlus im;
-    public boolean saveDepth = true;
-    public double[][] params;
+    public JsonObject jobj = new JsonObject();
 
     DepthProfile(ImagePlus im, ImagePlus sk){
-        for(int i = 0; i<2; i++) {
-            params = new double[2][];
-        }
         ImageProcessor ip = im.getProcessor();
         ip.autoThreshold();
-        if(saveDepth) {
-            params[0] = new double[ip.getHeight()];
-            for(int h = 0; h < ip.getHeight(); h++) {
-                int n = Line.count(ip, h);
-                params[0][h] = n;
-            }
+
+        JsonArray jline = new JsonArray();
+        for (int h = 0; h < ip.getHeight(); h++) {
+            int n = Line.count(ip, h);
+            jline.add(n);
         }
-        if(saveDepth) {
-            params[1] = new double[ip.getHeight()];
-            for(int h = 0; h < ip.getHeight(); h++) {
-                int n = Line.extent(ip, h);
-                params[1][h] = n;
-            }
+
+        JsonArray jextent = new JsonArray();
+        for (int h = 0; h < ip.getHeight(); h++) {
+            int n = Line.extent(ip, h);
+            jextent.add(n);
         }
+
+        jobj.add("line", jline);
+        jobj.add("extent", jextent);
     }
 }

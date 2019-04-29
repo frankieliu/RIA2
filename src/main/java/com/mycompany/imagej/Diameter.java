@@ -19,7 +19,7 @@ class Diameter {
     
     public ImagePlus im;
     public ImageProcessor ip;
-    public JsonObject jobj;
+    public JsonObject jobj = new JsonObject();
 
     /**
      * Find max diameter, main stem, and root extents
@@ -160,7 +160,6 @@ class Diameter {
         im.close();
 		skel.close();
 
-        jobj = new JsonObject();
         jobj.addProperty("max", rt.getValue("Max", 0));
         jobj.addProperty("mean", rt.getValue("Mean", 0));
         jobj.addProperty("mode", rt.getValue("Mode", 0));

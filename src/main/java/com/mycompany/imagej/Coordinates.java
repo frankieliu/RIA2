@@ -23,7 +23,7 @@ public class Coordinates {
     public double[] yCoord = new double[2*nCoord];
     public double[] diffCoord = new double[nCoord];
     public double[] cumulCoord = new double[nCoord];
-    public JsonObject jobj;
+    public JsonObject jobj = new JsonObject();
 
     Coordinates(ImagePlus im0, Geom geom) {
         im = im0.duplicate();
@@ -92,7 +92,6 @@ public class Coordinates {
         for(int i = 0; i < nCoord*2; i++) jy.add(yCoord[i]);
         for(int i = 0; i < nCoord; i++) jd.add(diffCoord[i]);
         for(int i = 0; i < nCoord; i++) jc.add(cumulCoord[i]);
-        jobj = new JsonObject();
         jobj.add("xCoord", jx);
         jobj.add("yCoord", jy);
         jobj.add("diff", jd);
