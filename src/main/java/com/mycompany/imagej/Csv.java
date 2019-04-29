@@ -1,17 +1,30 @@
 package com.mycompany.imagej;
 
+import java.io.File;
 import java.io.PrintWriter;
 
 public class Csv {
+    public String csvParamFolder, csvParamAnalysis;
+    public String tpsFolder, efdFolder;
+    public String depthAFolder, depthLFolder, depthDFolder;
     public PrintWriter pwParam, pwTPS, pwEFD, pwAnalysis;
+    public PrintWriter pwDA, pwDL, pwDD;
     public String baseName;
     public int nCoord;
     public int nSlices;
 
-    Csv(String baseName, int nCoord, int nSlices) {
+    Csv(String file, String baseName, int nCoord, int nSlices) {
+        csvParamFolder = file;
+        csvParamAnalysis = file.substring(0, file.length()-4)+"-analysis.csv";
+        tpsFolder = file.substring(0, file.length()-4)+"-shape.tps";
+        efdFolder = file.substring(0, file.length()-4)+"-efd.csv";
+        depthAFolder = file.substring(0, file.length()-4)+"-depthA.txt";
+        depthLFolder = file.substring(0, file.length()-4)+"-depthL.txt";
+        depthDFolder = file.substring(0, file.length()-4)+"-depthD.txt";
         this.baseName = baseName;
         this.nCoord = nCoord;
         this.nSlices = nSlices;
+
     }
     /**
      * Print Parameters CSV header
@@ -81,6 +94,30 @@ public class Csv {
         pwEFD.println(baseName +","+ i +","+ ax +","+ ay +","+ bx+","+ by+","+ efd);
 
         pwEFD.flush();
+    }
+
+
+    public void setPrintWriters() {
+        // Initialize CSV
+        pwParam = Util.initializeCSV(csvParamFolder);
+        pwAnalysis = Util.initializeCSV(csvParamAnalysis);
+        printParamCSVHeader();
+        printAnalysisCSVHeader();
+
+        pwTPS = Util.initializeCSV(tpsFolder);
+        pwEFD = Util.initializeCSV(efdFolder);
+        printEFDCSVHeader();
+
+        pwDA = Util.initializeCSV(depthAFolder);
+        pwDL = Util.initializeCSV(depthLFolder);
+        pwDD = Util.initializeCSV(depthDFolder);
+    }
+
+    public File dirParam(File dirAll) {
+        // Create the folder structure to store the images
+        File dirSave;
+        dirSave = Util.createFolderStructure(dirAll.getAbsolutePath(), false, false, false, true);
+        return new File(dirSave.getAbsolutePath() + "/param/");
     }
 
 }

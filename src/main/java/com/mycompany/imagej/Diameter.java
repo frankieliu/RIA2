@@ -19,6 +19,18 @@ class Diameter {
     
     public ImagePlus im;
     public ImageProcessor ip;
+
+    public int wmax = 0;
+    public int hmax = 0;
+    int winit;
+    int hinit;
+    public int maxLateral = 0;
+    public int maxLateralX = 0;
+    public int maxLateralY = 0;
+    public int maxRadial = 0;
+    public int maxRadialX = 0;
+    public int maxRadialY = 0;
+
     public JsonObject jobj = new JsonObject();
 
     /**
@@ -28,6 +40,7 @@ class Diameter {
      */
     Diameter(ImagePlus im0, ImagePlus skel){
         im = im0.duplicate();
+
         EDM edm = new EDM();
 		ImageCalculator ic = new ImageCalculator();
 		
@@ -40,22 +53,16 @@ class Diameter {
 		im.setProcessor(ip);
 
         // Frankie: added this to show result of EDM
-        ImageProcessor imdp2 = ip.duplicate();
-        ImagePlus ipd2 = new ImagePlus("edm.run", imdp2);
-        ipd2.show();
+        // ImageProcessor imdp2 = ip.duplicate();
+        // ImagePlus ipd2 = new ImagePlus("edm.run", imdp2);
+        // ipd2.show();
 
         //----------------------------------------------------------------------
         // Max lateral and radial
 
-        ImageProcessor ioverProc = ip.duplicate();
-        ImagePlus ioverPlus = new ImagePlus("Over", ioverProc);
-
         // Step 1: Search for main stem 
-
-        // 1. a) Find the "deepest" point (wmax, hmax)
         int max = -1;
-        int wmax = 0;
-        int hmax = 0;
+        // 1. a) Find the "deepest" point (wmax, hmax)
         for(int w = 0; w < ip.getWidth(); w++){
 	    	for(int h = 0; h < ip.getHeight(); h++){
                 int gray = ip.get(w,h);
@@ -66,13 +73,12 @@ class Diameter {
                 }
             }
         }
-        // System.out.println("Max: " + max);
 
         // 1. b) Follow from (wmax, hmax) up, to the stem root
         //       Consider only increasing lateral diameters
-        int winit = wmax;
-        int hinit = hmax;
         int wdia = 0;
+        winit = wmax;
+        hinit = hmax;
 
         // diameters
         for (int h = hinit; h >= 0 ; h--) {
@@ -96,17 +102,9 @@ class Diameter {
             } else {
                 break;
             }
-            
         }
 
         // Step 2: Find the max lateral radius and overl radius
-        int maxLateral = 0;
-        int maxLateralX = 0;
-        int maxLateralY = 0;
-                        
-        int maxRadial = 0;
-        int maxRadialX = 0;
-        int maxRadialY = 0;
 
         // Find the max lateral radius and max radius
         for(int w = 0; w < ip.getWidth(); w++){
@@ -129,14 +127,6 @@ class Diameter {
             }
         }
 
-        // Optional: display overlays
-        ioverPlus = Diameter.addCircle(wmax, hmax, 11, ioverPlus);
-        ioverPlus = Diameter.addCircle(winit, hinit, 11, ioverPlus);
-        ioverPlus = Diameter.addCircle(maxLateralX, maxLateralY, 11, ioverPlus);
-        ioverPlus = Diameter.addCircle(maxRadialX, maxRadialY, 11, ioverPlus);
-        ioverPlus.setTitle("Overlay"+wmax+" "+hmax+" "+winit+" "+hinit);
-        ioverPlus.show();
-
         //----------------------------------------------------------------------
         // Continue the regular script
         
@@ -144,21 +134,17 @@ class Diameter {
 		im = ic.run("AND create", im, skel);
 
         // Frankie: added
-        ImagePlus ipd3 = new ImagePlus("AND create", im.getProcessor());
-        ipd3.show();
+        // ImagePlus ipd3 = new ImagePlus("AND create", im.getProcessor());
+        // ipd3.show();
 
         // Apply threshold
 		IJ.setThreshold(im, 1, 255);
 		IJ.run(im, "Create Selection", "");
-
         ResultsTable rt = new ResultsTable();
 		Analyzer an = new Analyzer(im, Measurements.MODE | Measurements.MEAN | Measurements.MIN_MAX , rt);
         Analyzer.setResultsTable(rt);
 		rt.reset();
 		an.measure();
-
-        im.close();
-		skel.close();
 
         jobj.addProperty("max", rt.getValue("Max", 0));
         jobj.addProperty("mean", rt.getValue("Mean", 0));
@@ -173,6 +159,18 @@ class Diameter {
         jobj.addProperty("maxRadialY", maxRadialY);
 	}
 
+	public ImagePlus overlay() {
+        ImageProcessor ioverProc = ip.duplicate();
+        ImagePlus ioverPlus = new ImagePlus("Over", ioverProc);
+        // Optional: display overlays
+        ioverPlus = Diameter.addCircle(wmax, hmax, 11, ioverPlus);
+        ioverPlus = Diameter.addCircle(winit, hinit, 11, ioverPlus);
+        ioverPlus = Diameter.addCircle(maxLateralX, maxLateralY, 11, ioverPlus);
+        ioverPlus = Diameter.addCircle(maxRadialX, maxRadialY, 11, ioverPlus);
+        ioverPlus.setTitle("Overlay"+wmax+" "+hmax+" "+winit+" "+hinit);
+        return ioverPlus;
+    }
+
     public static ImagePlus addCircle(int w, int h, int r, ImagePlus ori) {
 
         Roi apex = new OvalRoi(w - r/2, h - r/2, r, r);
@@ -183,6 +181,5 @@ class Diameter {
         ori.setOverlay(overlay);
         return ori.flatten();
     }
-
 
 }

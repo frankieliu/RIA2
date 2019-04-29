@@ -10,21 +10,20 @@ import ij.process.BinaryProcessor;
 import ij.process.ByteProcessor;
 import ij.process.ImageProcessor;
 
-
 public class Preprocess {
 
     // Default from RIAInterface
     public double scalePix = 2020f;
     public double scaleCm = 23.5f;
     public double rootMinSize = 50;
-    public boolean blackRoots = true;
+    public boolean blackRoots;
     // Resize the image to speed up the analysis (resize to width = 800)
     public double scale = scalePix/scaleCm;
 
     public ImagePlus im;
     public ImagePlus skel;
 
-    public Preprocess(ImagePlus im0) {
+    Preprocess(ImagePlus im0, boolean blackRoots) {
         im = im0.duplicate();
         ImageProcessor ip = im.getProcessor();
         ResultsTable rt = new ResultsTable();
@@ -33,6 +32,7 @@ public class Preprocess {
         if (ip.getBitDepth() != 8) ip = ip.convertToByte(true);
 
         // If the root is white on black, then invert the image
+        this.blackRoots = blackRoots;
         if (!blackRoots) {
             ip.invert();
             System.out.println("root inverted");
@@ -71,7 +71,6 @@ public class Preprocess {
         skel.setProcessor(bp);
 
         // if(saveImages) IJ.save(skel, dirParam.getAbsolutePath()+"/"+baseName+"_skeleton.tiff");
-
 
         skel.setRoi(0, 0, ip.getWidth(), ip.getHeight());
         im.setRoi(0, 0, ip.getWidth(), ip.getHeight());

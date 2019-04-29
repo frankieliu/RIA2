@@ -25,7 +25,7 @@ public class ConvexHull {
     public JsonObject jobj = new JsonObject();
     public int nEFD = 30;
 
-    ConvexHull(ImagePlus im0, boolean efd){
+    ConvexHull(ImagePlus im0){
         im = im0.duplicate();
         ResultsTable rt = new ResultsTable();
 
