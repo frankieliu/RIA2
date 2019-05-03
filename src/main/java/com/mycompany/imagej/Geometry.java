@@ -9,25 +9,28 @@ import ij.measure.ResultsTable;
 import ij.measure.Measurements;
 
 import java.awt.*;
-import java.util.*;
 
 public class Geometry {
-
+    public ImagePlus im;
+    public ImagePlus skel;
     public double epsilon= 1e-9f;
     public Geom geo = new Geom();
 
     /**
-     * @param im input image
-     * @param skeleton its pre-computed skeleton
+     * @param im0 input image
+     * @param skel0 its pre-computed skel
      */
-    public Geometry(ImagePlus im, ImagePlus skeleton) {
+    public Geometry(ImagePlus im0, ImagePlus skel0) {
+        im = im0.duplicate();
+        skel = skel0.duplicate();
+
         im.getProcessor().autoThreshold();
         IJ.run(im, "Create Selection", "");
         ResultsTable rt = new ResultsTable();
         Analyzer.setResultsTable(rt);
         Analyzer an;
 
-        an = new Analyzer(skeleton, Measurements.AREA | Measurements.AREA_FRACTION | Measurements.RECT, rt);
+        an = new Analyzer(skel, Measurements.AREA | Measurements.AREA_FRACTION | Measurements.RECT, rt);
         rt.reset(); an.measure();
         geo.length = ((rt.getValue("%Area", 0) / 100) * rt.getValue("Area", 0));
 
@@ -44,7 +47,7 @@ public class Geometry {
         geo.yMid = rt.getValue("BY", 0);
         geo.xMid = rt.getValue("XM", 0);
         im.close();
-        skeleton.close();
+        skel.close();
     }
 
     public ImagePlus overlay(ImagePlus im){

@@ -17,9 +17,9 @@ import java.awt.*;
 
 public class DensityRectangles {
 
-    public double[] dMod = {0.25f, 0.5f, 0.75f, 1f};
-    // public float[] dMod = {0, 0.2f, 0.4f, 0.6f};
-    public Roi[] roi = new OvalRoi[dMod.length];
+    // public double[] dMod = {0.25f, 0.5f, 0.75f, 1f};
+    public double[] dMod = {0, 0.2f, 0.4f, 0.6f};
+    public Roi[] roi = new Roi[dMod.length];
     public ImagePlus im;
     public ImageProcessor ip;
     public JsonObject jobj = new JsonObject();
@@ -39,9 +39,8 @@ public class DensityRectangles {
         im.getProcessor().autoThreshold();
         im.getProcessor().invert();
         JsonArray ja = new JsonArray();
-
         for (int i = 0; i < dMod.length; i++) {
-            roi[i] = new Roi((geo.xMid - 0.5 * geo.width), geo.yMid + (dMod[i] * geo.height), geo.width, 0.2 * geo.height);
+            roi[i] = new Roi(geo.xMid - 0.5 * geo.width, geo.yMid + (dMod[i] * geo.height), geo.width, 0.2 * geo.height);
             im.setRoi(roi[i]);
             rt.reset();
             pa = new ParticleAnalyzer(ParticleAnalyzer.CLEAR_WORKSHEET, Measurements.AREA, rt, 0, 10e9, 0, 1);

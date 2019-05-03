@@ -39,7 +39,7 @@ import javax.swing.text.StyledDocument;
 import com.mycompany.imagej.RootAnalysis;
 import com.mycompany.imagej.Util;
 
-public class RIAInterface extends JFrame implements ItemListener, ActionListener, ChangeListener{
+public class Gui extends JFrame implements ItemListener, ActionListener, ChangeListener{
 	
 //------------------------------------	
 // GENERAL
@@ -62,7 +62,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 	/**
 	 * Constructor
 	 */
-	public RIAInterface(){
+	public Gui(){
 		build();	
 	}
 	
@@ -462,7 +462,7 @@ public class RIAInterface extends JFrame implements ItemListener, ActionListener
 			}
 			Thread ra = new Thread(new Runnable() {
 		 		public void run() {	
-					new RootAnalysis(
+					new Results(
 							new File(rootImageFolder.getText()), 
 							rootCSVFile.getText(),
 							Float.valueOf(rootScalePix.getText()), 

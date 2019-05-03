@@ -28,12 +28,24 @@ class Rotate {
         return a;
     }
 
+
+    /**
+     * @param im input image
+     * @return best rotation angle
+     */
     public static double getAngle(ImagePlus im) {
         double angle = getAngle(im, -15., 1., 15.);
         angle = getAngle(im, angle, 0.1, angle + 1);
         return angle;
     }
 
+    /**
+     * @param im input image
+     * @param begin beginning angle
+     * @param step step
+     * @param end ending angle
+     * @return best rotation angle
+     */
     public static double getAngle(ImagePlus im, double begin, double step, double end){
         double hmin = 1e10;
         double angle = begin;

@@ -19,7 +19,7 @@ public class RIA_2 extends PlugInFrame{
 	public RIA_2() {
 		super("Root Image Analysis J");
 		
-		new RIAInterface();
+		new Gui();
 	}
 	
 	
@@ -27,11 +27,11 @@ public class RIA_2 extends PlugInFrame{
 		if(args.length > 0){
 
 			if(args.length == 6){
-				new RootAnalysis(new File(args[0]), args[1], Float.valueOf(args[2]), 2.54f, 
+				new Results(new File(args[0]), args[1], Float.valueOf(args[2]), 2.54f,
 					true, 50, false, true, true, Boolean.valueOf(args[3]), true, Boolean.valueOf(args[4]), args[5] 
 					);
 			} else if(args.length > 6){
-				new RootAnalysis(new File(args[0]), args[1], Float.valueOf(args[2]), 2.54f, 
+				new Results(new File(args[0]), args[1], Float.valueOf(args[2]), 2.54f,
 					true, 50, false, Boolean.valueOf(args[6]), Boolean.valueOf(args[7]), 
 					Boolean.valueOf(args[3]), false, Boolean.valueOf(args[4]), args[5] 
 					);

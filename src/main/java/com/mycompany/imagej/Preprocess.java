@@ -12,7 +12,7 @@ import ij.process.ImageProcessor;
 
 public class Preprocess {
 
-    // Default from RIAInterface
+    // Default from Gui
     public double scalePix = 2020f;
     public double scaleCm = 23.5f;
     public double rootMinSize = 50;

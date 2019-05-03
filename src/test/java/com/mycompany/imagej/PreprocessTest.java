@@ -18,10 +18,10 @@ class PreprocessTest {
 
     @Test
     void getNumbers() {
-        file = new File("src/main/resources/Images/root_1_lg.png");
-
+        file = new File("src/test/resources/Images/root_1_lg.png");
         nextImage = IJ.openImage(file.getAbsolutePath());
-        Preprocess pp = new Preprocess(nextImage);
+
+        Preprocess pp = new Preprocess(nextImage, true);
         nextImage.show();
         pp.im.show();
         pp.skel.show();

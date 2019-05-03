@@ -14,13 +14,14 @@ import ij.plugin.filter.ParticleAnalyzer;
 import java.awt.*;
 
 public class DensityEllipses {
-
+    public ImagePlus im;
     public float[] wMod = {0.125f, 0.25f, 0.375f, 0.5f};
     public float[] dMod = {0.25f, 0.5f, 0.75f, 1f};
     public OvalRoi[] roi = new OvalRoi[dMod.length];
     public JsonObject jobj = new JsonObject();
 
-    DensityEllipses(ImagePlus im, Geom geo) {
+    DensityEllipses(ImagePlus im0, Geom geo) {
+        im = im0.duplicate();
 
         ParticleAnalyzer pa;
         ResultsTable rt = new ResultsTable();
