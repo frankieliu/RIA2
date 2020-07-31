@@ -18,6 +18,7 @@ import java.awt.*;
 
 public class ConvexHull {
 
+    public String name;
     public ImagePlus im;
     public ImageProcessor ip;
     public Roi select;
@@ -26,6 +27,7 @@ public class ConvexHull {
     public int nEFD = 30;
 
     ConvexHull(ImagePlus im0){
+        name = "Convex Hull";
         im = im0.duplicate();
         ResultsTable rt = new ResultsTable();
 
@@ -53,6 +55,7 @@ public class ConvexHull {
         RoiManager manager = RoiManager.getInstance();
         Roi[] roiA = manager.getRoisAsArray();
         select = roiA[index];
+        manager.close();
 
         PolygonRoi cv = new PolygonRoi(select.getConvexHull(), Roi.POLYGON);
 

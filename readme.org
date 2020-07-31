@@ -11,3 +11,4 @@ from IntelliJ you can go to file and open the pom
 you will need to point modules to either the package (RIA2)
 or to JDK since using a newer one 12
 
+* Batch added command line options

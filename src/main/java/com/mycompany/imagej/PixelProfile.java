@@ -11,12 +11,13 @@ import com.google.gson.JsonArray;
 import java.awt.*;
 
 public class PixelProfile {
-
+    public String name;
     public int nSlices = 30;
     public ImagePlus im;
     public JsonObject jobj = new JsonObject();
 
     PixelProfile(ImagePlus im0,Geom geo){
+        name = "Pixel Profile";
         im = im0.duplicate();
 
         double sum, count, max, tot;

@@ -7,11 +7,13 @@ import ij.ImagePlus;
 import ij.process.ImageProcessor;
 
 public class DepthProfile {
-
+    public String name;
     public ImagePlus im;
     public JsonObject jobj = new JsonObject();
 
-    DepthProfile(ImagePlus im, ImagePlus sk){
+    DepthProfile(ImagePlus im0, ImagePlus sk){
+        name = "Depth Profile";
+        im = im0.duplicate();
         ImageProcessor ip = im.getProcessor();
         ip.autoThreshold();
 

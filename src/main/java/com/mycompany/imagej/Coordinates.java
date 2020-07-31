@@ -16,7 +16,7 @@ import com.google.gson.JsonArray;
 import java.awt.*;
 
 public class Coordinates {
-
+    public String name;
     public ImagePlus im;
     public int nCoord = 10;
     public double[] xCoord = new double[2*nCoord];
@@ -26,6 +26,7 @@ public class Coordinates {
     public JsonObject jobj = new JsonObject();
 
     Coordinates(ImagePlus im0, Geom geom) {
+        name = "Coordinates";
         im = im0.duplicate();
         // Get bounding box
         im.getProcessor().autoThreshold();

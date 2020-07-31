@@ -12,6 +12,7 @@ import ij.process.ImageProcessor;
 
 public class Preprocess {
 
+    public String name;
     // Default from Gui
     public double scalePix = 2020f;
     public double scaleCm = 23.5f;
@@ -24,6 +25,7 @@ public class Preprocess {
     public ImagePlus skel;
 
     Preprocess(ImagePlus im0, boolean blackRoots) {
+        name = "Preprocess";
         im = im0.duplicate();
         ImageProcessor ip = im.getProcessor();
         ResultsTable rt = new ResultsTable();
@@ -38,7 +40,7 @@ public class Preprocess {
             System.out.println("root inverted");
         }
 
-        // Threshold the image (used to be Otsu
+        // Threshold the image (used to be Otsu)
         ip.setAutoThreshold("Default");
         im.setProcessor(ip);
 
@@ -47,7 +49,7 @@ public class Preprocess {
         pa = new ParticleAnalyzer(ParticleAnalyzer.SHOW_MASKS, Measurements.AREA, rt, rootMinSize, 10e9, 0, 1);
         pa.analyze(im);
 
-        // Get the mask from the ParticuleAnalyser
+        // Get the mask from the Particle Analyzer
         im = IJ.getImage();
         im.hide(); // Hide the mask, we do not want to display it.
         ip = im.getProcessor();
@@ -56,7 +58,7 @@ public class Preprocess {
         // This is needed in case the image was previously calibrated using ImageJ.
         // TIFF images store the calibration...
         Calibration calDefault = new Calibration();
-        calDefault.setUnit("px");
+        calDefault.setUnit("pixelProfile");
         calDefault.pixelHeight = 1;
         calDefault.pixelWidth = 1;
         im.setCalibration(calDefault);
@@ -75,10 +77,11 @@ public class Preprocess {
         skel.setRoi(0, 0, ip.getWidth(), ip.getHeight());
         im.setRoi(0, 0, ip.getWidth(), ip.getHeight());
 
-        // skel.show(); im.show();
-
+        skel.setTitle(name + " Skeleton");
+        im.setTitle(name + " Main");
     }
 
     public boolean isBlackRoots() { return blackRoots; }
     public void setBlackRoots(boolean blackRoots) { this.blackRoots = blackRoots; }
+
 }

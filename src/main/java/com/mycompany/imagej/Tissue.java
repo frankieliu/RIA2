@@ -8,11 +8,13 @@ import ij.plugin.filter.EDM;
 import ij.process.ImageProcessor;
 
 class Tissue {
+    public String name;
     public ImagePlus im;
     public ImagePlus skel;
     JsonObject jobj = new JsonObject();
 
     Tissue(ImagePlus im0, ImagePlus skel0) {
+        name = "Tissue";
         im = im0.duplicate();
         skel = skel0.duplicate();
 

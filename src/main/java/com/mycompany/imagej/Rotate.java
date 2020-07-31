@@ -1,5 +1,6 @@
 package com.mycompany.imagej;
 
+import com.google.gson.JsonObject;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.gui.Roi;
@@ -33,7 +34,7 @@ class Rotate {
      * @param im input image
      * @return best rotation angle
      */
-    public static double getAngle(ImagePlus im) {
+    public double getAngle(ImagePlus im) {
         double angle = getAngle(im, -15., 1., 15.);
         angle = getAngle(im, angle, 0.1, angle + 1);
         return angle;
@@ -46,11 +47,11 @@ class Rotate {
      * @param end ending angle
      * @return best rotation angle
      */
-    public static double getAngle(ImagePlus im, double begin, double step, double end){
+    public double getAngle(ImagePlus im, double begin, double step, double end){
         double hmin = 1e10;
         double angle = begin;
-        
-        System.out.println("Finding min angle");
+        if (debug == true)
+            System.out.println("Finding min angle");
         do {
             ImagePlus im2 = im.duplicate();
             IJ.run(im2, "Select All", "");
@@ -70,8 +71,10 @@ class Rotate {
                 break;
             }
             hmin = wh[1];
-            System.out.println(angle + " " + hmin);
-            System.out.flush();
+            if (debug == true) {
+                System.out.println(angle + " " + hmin);
+                System.out.flush();
+            }
             angle += step;
             if (angle > end) {
                 break;
@@ -90,11 +93,30 @@ class Rotate {
         return vol;
     }
 
-    public static double getVolume(ImagePlus im) {
-        System.out.println("Vol b4: " + getVolumeFromExtents(im));
+    public String name;
+    public ImagePlus im;
+    public ImagePlus skel;
+    JsonObject jobj = new JsonObject();
+    boolean debug;
 
+    Rotate(ImagePlus im0, ImagePlus skel0, Boolean debug0) {
+        debug = debug0;
+        init(im0, skel0);
+    }
+
+    Rotate(ImagePlus im0, ImagePlus skel0) {
+        debug = false;
+        init(im0, skel0);
+    }
+
+    public void init(ImagePlus im0, ImagePlus skel0) {
+        name = "Rotate";
+        im = im0.duplicate();
+        skel = skel0.duplicate();
+
+        jobj.addProperty("volume before rotation", getVolumeFromExtents(im));
         double angle = getAngle(im);
-
+        jobj.addProperty("angle", angle);
         /*
         if (false) {
             IJ.run(im, "Select All", "");
@@ -112,10 +134,15 @@ class Rotate {
         ip.rotate(angle);
         im.setProcessor(ip);
         im.setTitle("Rotated");
-        im.show();
-        
-        double vol = getVolumeFromExtents(im);
-        System.out.println("Vol af: " + getVolumeFromExtents(im));
-        return vol;
+
+        ImageProcessor skel_ip = skel.getProcessor();
+        skel_ip.setInterpolate(true);
+        skel_ip.setInterpolationMethod(ImageProcessor.BILINEAR);
+        skel_ip.rotate(angle);
+        skel.setProcessor(skel_ip);
+        skel.setTitle("Skeleton Rotated");
+
+        jobj.addProperty("volume after rotation", getVolumeFromExtents(im));
     }
+
 }

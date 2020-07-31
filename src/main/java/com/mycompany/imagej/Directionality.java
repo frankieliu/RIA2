@@ -123,8 +123,8 @@ import javax.swing.JTable;
  *  <pre>
  *  ImagePlus imp = IJ.openImage("./TwoLines.tif");
  *  imp.show();
- *  Directionality_ da = new Directionality_();
- *  da.run("nbins=60, start=-90, method=gradient");
+ *  Directionality_ directionalityAnalysis = new Directionality_();
+ *  directionalityAnalysis.run("nbins=60, start=-90, method=gradient");
  *  </pre>
  * 
  * It is also possible to run the plugin non-interactively from another class, or even in
@@ -1627,17 +1627,17 @@ public class Directionality implements PlugIn {
 		center = fit_results.get(0)[2];
 		System.out.println("With method: "+method);
 		System.out.println(String.format("Found maxima at %.1f, expected it at 30°.\n", center, 30));
-//		new ImagePlus("Orientation map for "+imp.getShortTitle(),da.getOrientationMap()).show();
+//		new ImagePlus("Orientation map for "+imp.getShortTitle(),directionalityAnalysis.getOrientationMap()).show();
 		
 		/*
 		method = AnalysisMethod.LOCAL_GRADIENT_ORIENTATION;
-		da.setMethod(method);
-		da.computesHistograms();
-		fit_results = da.getFitParameters();
+		directionalityAnalysis.setMethod(method);
+		directionalityAnalysis.computesHistograms();
+		fit_results = directionalityAnalysis.getFitParameters();
 		center = fit_results.get(0)[2];
 		System.out.println("With method: "+method);
 		System.out.println(String.format("Found maxima at %.1f, expected it at 30º.\n", center, 30));
-		new ImagePlus("Orientation map for "+imp.getShortTitle(),da.getOrientationMap()).show();
+		new ImagePlus("Orientation map for "+imp.getShortTitle(),directionalityAnalysis.getOrientationMap()).show();
 		 */
 		
 //		ImagePlus cw = generateColorWheel();

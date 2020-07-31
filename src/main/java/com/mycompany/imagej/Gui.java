@@ -540,7 +540,7 @@ public class Gui extends JFrame implements ItemListener, ActionListener, ChangeL
 
 		String text = "\n RIAJ is a plugin created and maintained by\n-\n"
 				+"Guillaume Lobet - Forschungszentrum Juelich\n"
-				+ "g.lobet@fz-juelich.de\n"
+				+ "g.lobet@fz-juelich.densityEllipses\n"
 				+ "@guillaumelobet\n"
 				+"-\n"
 				+"Iko Koevoets - University of Utrecht\n"

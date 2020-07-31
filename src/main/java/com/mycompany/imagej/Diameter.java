@@ -16,7 +16,7 @@ import java.awt.Color;
 import com.google.gson.JsonObject;
 
 class Diameter {
-    
+    public String name;
     public ImagePlus im;
     public ImageProcessor ip;
 
@@ -39,18 +39,21 @@ class Diameter {
      * @param skel = skeleton image
      */
     Diameter(ImagePlus im0, ImagePlus skel){
+        name = "Diameter";
         im = im0.duplicate();
 
         EDM edm = new EDM();
 		ImageCalculator ic = new ImageCalculator();
 		
 		// Create EDM mask
-		ip = this.im.getProcessor();
+		ip = im.getProcessor();
 		ip.autoThreshold();
 		//ip.invert();
 
 		edm.run(ip);
 		im.setProcessor(ip);
+        im.setTitle("Diameter edm");
+        // im.show();
 
         // Frankie: added this to show result of EDM
         // ImageProcessor imdp2 = ip.duplicate();
@@ -161,13 +164,21 @@ class Diameter {
 
 	public ImagePlus overlay() {
         ImageProcessor ioverProc = ip.duplicate();
-        ImagePlus ioverPlus = new ImagePlus("Over", ioverProc);
+        ImagePlus ioverPlus = new ImagePlus("Diameter Overlay", ioverProc);
         // Optional: display overlays
         ioverPlus = Diameter.addCircle(wmax, hmax, 11, ioverPlus);
         ioverPlus = Diameter.addCircle(winit, hinit, 11, ioverPlus);
         ioverPlus = Diameter.addCircle(maxLateralX, maxLateralY, 11, ioverPlus);
         ioverPlus = Diameter.addCircle(maxRadialX, maxRadialY, 11, ioverPlus);
-        ioverPlus.setTitle("Overlay"+wmax+" "+hmax+" "+winit+" "+hinit);
+        ioverPlus.setTitle("Overlay"
+                + " wmax: " + wmax
+                + " hmax: " + hmax
+                + " winit: " + winit
+                + " hinit: " + hinit
+                + " maxLateralX: " + maxLateralX
+                + " maxLateralY: " + maxLateralY
+                + " maxRadialX: " + maxRadialX
+                + " maxRadialY: " + maxRadialY);
         return ioverPlus;
     }
 

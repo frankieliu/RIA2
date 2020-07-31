@@ -17,6 +17,7 @@ import java.awt.*;
 
 public class DensityRectangles {
 
+    public String name;
     // public double[] dMod = {0.25f, 0.5f, 0.75f, 1f};
     public double[] dMod = {0, 0.2f, 0.4f, 0.6f};
     public Roi[] roi = new Roi[dMod.length];
@@ -30,6 +31,7 @@ public class DensityRectangles {
      * @param geo Geom object
      */
     DensityRectangles(ImagePlus im0, Geom geo) {
+        name = "Density Rectangles";
         im = im0.duplicate();
         ip = im.getProcessor();
         ResultsTable rt = new ResultsTable();
@@ -52,7 +54,7 @@ public class DensityRectangles {
             }
             ja.add(ar1/geo.area);
         }
-        jobj.add("densityRectangles", ja);
+        jobj.add("area", ja);
     }
 
     public ImagePlus overlay() {

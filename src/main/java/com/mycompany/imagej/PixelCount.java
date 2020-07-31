@@ -22,6 +22,7 @@
             }
         }
 
+        public String name;
         public ImagePlus im;
         public ImageProcessor ip;
         public ImagePlus ori;
@@ -30,6 +31,7 @@
         JsonObject jobj = new JsonObject();
 
         PixelCount(ImagePlus im0, ImagePlus ori0) {
+            name = "Pixel Count";
             im = im0.duplicate();
             ori = ori0.duplicate();
 
@@ -63,6 +65,7 @@
                 ori.setOverlay(over);
                 ori = ori.flatten();
             }
+            ori.setTitle("Pixel Count");
             return ori;
         }
 

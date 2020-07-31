@@ -9,12 +9,13 @@ import ij.measure.ResultsTable;
 import ij.process.ImageProcessor;
 
 public class DirectionalityAnalysis {
-
+    public String name;
     public ImagePlus im;
     public ImageProcessor ip;
     public JsonObject jobj = new JsonObject();
 
     DirectionalityAnalysis(ImagePlus im0, Geom geo){
+        name = "Directionality Analysis";
         im = im0.duplicate();
 
         ip = im.getProcessor();
@@ -52,7 +53,7 @@ public class DirectionalityAnalysis {
         }
         rs.reset();
 
-        jobj.addProperty("anglePropotion", angle / tot);
+        jobj.addProperty("angle proportion", angle / tot);
     }
 
 }

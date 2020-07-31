@@ -14,6 +14,7 @@ import ij.plugin.filter.ParticleAnalyzer;
 import java.awt.*;
 
 public class DensityEllipses {
+    public String name;
     public ImagePlus im;
     public float[] wMod = {0.125f, 0.25f, 0.375f, 0.5f};
     public float[] dMod = {0.25f, 0.5f, 0.75f, 1f};
@@ -21,6 +22,7 @@ public class DensityEllipses {
     public JsonObject jobj = new JsonObject();
 
     DensityEllipses(ImagePlus im0, Geom geo) {
+        name = "Density Ellipses";
         im = im0.duplicate();
 
         ParticleAnalyzer pa;
@@ -48,7 +50,7 @@ public class DensityEllipses {
         jobj.add("area",ja);
     }
 
-    public ImagePlus overlay(ImagePlus im) {
+    public ImagePlus overlay() {
         im.getProcessor().invert();
         for (OvalRoi r: roi){
             r.setStrokeColor(Color.BLUE);
@@ -57,6 +59,7 @@ public class DensityEllipses {
             im.setOverlay(Eloverlay);
             im = im.flatten();
         }
+        im.setTitle(name);
         return im;
         // IJ.save(im, dirParam.getAbsolutePath() + "/" + baseName + "_ellipses.tiff");
     }
