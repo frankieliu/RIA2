@@ -15,4 +15,4 @@ CLASS=com.mycompany.imagej.Batch
 # CLASS="com.mycompany.imagej.Batch"
 
 # $JAVA $IDEA $ENCODING $CLASSPATH $INTELLLIJ $CLASS $@
-$JAVA $ENCODING $CLASSPATH $CLASS $@
+$JAVA -Xmx8G $ENCODING $CLASSPATH $CLASS $@

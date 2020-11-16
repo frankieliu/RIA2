@@ -3,4 +3,4 @@ target/
 nulljars/
 *.class
 *~
-
+*.swp

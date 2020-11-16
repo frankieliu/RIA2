@@ -30,82 +30,6 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FUSProjectUsageTrigger">
-    <session id="-906157111">
-      <usages-collector id="statistics.lifecycle.project">
-        <counts>
-          <entry key="project.closed" value="23" />
-          <entry key="project.open.time.18" value="1" />
-          <entry key="project.open.time.19" value="5" />
-          <entry key="project.open.time.2" value="1" />
-          <entry key="project.open.time.20" value="2" />
-          <entry key="project.open.time.21" value="3" />
-          <entry key="project.open.time.22" value="1" />
-          <entry key="project.open.time.23" value="2" />
-          <entry key="project.open.time.25" value="1" />
-          <entry key="project.open.time.26" value="1" />
-          <entry key="project.open.time.27" value="4" />
-          <entry key="project.open.time.28" value="1" />
-          <entry key="project.open.time.29" value="1" />
-          <entry key="project.open.time.30" value="1" />
-          <entry key="project.open.time.31" value="1" />
-          <entry key="project.open.time.39" value="1" />
-          <entry key="project.open.time.7" value="1" />
-          <entry key="project.opened" value="27" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.open">
-        <counts>
-          <entry key="0-SNAPSHOT" value="1" />
-          <entry key="MF" value="1" />
-          <entry key="PrintParam" value="1" />
-          <entry key="class" value="2" />
-          <entry key="config" value="1" />
-          <entry key="iml" value="2" />
-          <entry key="java" value="161" />
-          <entry key="kt" value="1" />
-          <entry key="org" value="2" />
-          <entry key="png" value="1" />
-          <entry key="svg" value="1" />
-          <entry key="xml" value="4" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.open">
-        <counts>
-          <entry key="CLASS" value="2" />
-          <entry key="IDEA_MODULE" value="2" />
-          <entry key="Image" value="1" />
-          <entry key="JAVA" value="162" />
-          <entry key="Kotlin" value="1" />
-          <entry key="Manifest" value="1" />
-          <entry key="PLAIN_TEXT" value="3" />
-          <entry key="SVG" value="1" />
-          <entry key="UML" value="1" />
-          <entry key="XML" value="4" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.extensions.edit">
-        <counts>
-          <entry key="MF" value="54" />
-          <entry key="config" value="1" />
-          <entry key="dummy" value="16" />
-          <entry key="iml" value="1" />
-          <entry key="java" value="25916" />
-          <entry key="txt" value="228" />
-          <entry key="xml" value="168" />
-        </counts>
-      </usages-collector>
-      <usages-collector id="statistics.file.types.edit">
-        <counts>
-          <entry key="IDEA_MODULE" value="1" />
-          <entry key="JAVA" value="25916" />
-          <entry key="Manifest" value="54" />
-          <entry key="PLAIN_TEXT" value="245" />
-          <entry key="XML" value="168" />
-        </counts>
-      </usages-collector>
-    </session>
-  </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
       <file pinned="false" current-in-tab="false">
@@ -480,6 +404,7 @@
       </extension>
       <option name="PACKAGE_NAME" value="com.mycompany.imagej" />
       <option name="MAIN_CLASS_NAME" value="com.mycompany.imagej.BatchTest" />
+      <option name="TEST_OBJECT" value="class" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
