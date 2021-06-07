@@ -12,7 +12,7 @@ closedir(DH);
 my %h;
 
 for my $d (@dh) {
-  if ($d =~ /([a-z])([0-9.]+)(\.(left|right|middle))?$/) {
+  if ($d =~ /([a-z])([0-9.]+)(\.(left|right|middle|upper|lower|top|bottom))?$/) {
     my $letter = $1;
     my $number = $2;
     my @num = split(/\./,$number);

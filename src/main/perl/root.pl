@@ -4,14 +4,14 @@ use warnings;
 use File::Basename;
 
 # From the current directory
-# 1. Look for directories beginning with W or w
+# 1. Look for directories beginning with W or w or N
 # 2. In each of these directories look for jobj.json
 # 3. If found then, continue to next directory
 
 my $dirname = dirname(__FILE__);
 
 opendir(DH, ".");
-my @dir = grep { -d $_ && /^[Ww]/ } readdir(DH);
+my @dir = grep { -d $_ && /^[WwNbv]/ } readdir(DH);
 for my $d (@dir) {
   opendir(DH1, "./$d");
   # print readdir(DH1);
